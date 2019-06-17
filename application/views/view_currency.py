@@ -70,7 +70,7 @@ def currency_post():
         last_result = update_last_result("currency", result)
         text_for_message_telegram = prepare_message(result, last_result)
         from start import send_telegram
-        send_telegram(text_for_message_telegram)
+        # send_telegram(text_for_message_telegram)
         print(indicators_result.get('wma 4 result'))
         markup_result['wma 4'] = result_wma_to_markup(result)
 
