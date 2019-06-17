@@ -1,0 +1,10 @@
+*.db
+quotes.db
+./application/quotes.db
+db/*.sqlite3
+.git
+.cache
+
+*.md
+!README*.md
+README-secret.md

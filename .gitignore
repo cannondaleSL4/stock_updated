@@ -1,0 +1,23 @@
+# Created by .ignore support plugin (hsz.mobi)
+# Intellij
+.idea/*
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+__pycache__
+*.py[cod]
+
+# database
+.db
+*.db
+.db-journal
+*.db-journal

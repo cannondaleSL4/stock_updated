@@ -1,0 +1,83 @@
+import os
+import const
+
+from flask import Blueprint, Markup, render_template, request, flash
+
+from analyse import make_analyse, set_currensy_result
+from download_update import *
+from indicators_analyse import *
+from prepare_markup import *
+from const import *
+from check import check_latest_record
+
+from optimisation import get_best_params
+
+template_dir = os.path.abspath('templates')
+static_dir = os.path.abspath('static')
+
+view_currency = Blueprint('view_currency', __name__, template_folder=template_dir, static_folder=static_dir,
+                          static_url_path=static_dir)
+
+
+@view_currency.route("/")
+def currency_page():
+    if not const.database_uploaded:
+        flash("Please waiting database still uploading")
+
+    return render_template('currency.html',
+                           first_page="", second_page="/stock",
+                           active="nav-link active",
+                           not_active="nav-link",
+                           instruments=sorted(currency.keys()))
+
+
+@view_currency.route('/', methods=['POST'])
+def currency_post():
+    markup_result = dict()
+    list_for_update = list(currency.keys())
+    if request.form['form'] == 'Upload data':
+        create_dir("currency")
+        if len(request.form.getlist('instr')) == 0:
+            clear_dir("currency")
+            result = "upload all instruments has been executed"
+        else:
+            list_for_update = request.form.getlist('instr')
+            result = Markup("update for : </br> {} </br> quotes was been executed"
+                            .format('</br>'.join(request.form.getlist('instr'))))
+        make_request(list_for_update, today_only=False)
+        flash(result)
+    if request.form['form'] == 'Update data':
+        create_dir("currency")
+        if len(request.form.getlist('instr')) == 0:
+            clear_dir("currency")
+            result = "update all instruments has been executed"
+        else:
+            list_for_update = request.form.getlist('instr')
+            result = Markup("update for : </br> {} </br> quotes was been executed"
+                            .format('</br>'.join(request.form.getlist('instr'))))
+        make_request(list_for_update, today_only=True)
+        flash(result)
+    if request.form['form'] == 'Clear':
+        create_dir("currency")
+        clear_dir("currency")
+        result = "all data has been clear from {}/currency".format(UPLOAD_FOLDER)
+        flash(result)
+
+    if request.form['form'] == 'Analyse':
+        if len(const.result_currency) == 0:
+            result_of_analyse = make_analyse(list_for_update)
+            indicators_result = result_of_analyse.get('indicators')
+            set_currensy_result(indicators_result.get('wma 4 result'))
+        text_for_message = prepare_message(const.result_currency)
+        print(text_for_message)
+        markup_result['wma 4'] = result_wma_to_markup(const.result_currency)
+
+    if request.form['form'] == 'Optimize':
+        get_best_params(list_for_update)
+
+
+    return render_template('currency.html',
+                           first_page="", second_page="/stock",
+                           active="nav-link active",
+                           not_active="nav-link",
+                           instruments=sorted(currency.keys()), markup_result=markup_result)
