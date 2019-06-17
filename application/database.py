@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import sqlite3
@@ -16,6 +17,12 @@ create_quotes = """CREATE TABLE IF NOT EXISTS quotes
 create_index_code = "CREATE INDEX IF NOT EXISTS  index_quotes_code ON quotes(code)"
 create_index_instrument = "CREATE INDEX  IF NOT EXISTS index_quotes_instrument ON quotes(instrument)"
 
+create_table_last_result = "CREATE TABLE IF NOT EXISTS last_result(id integer primary key, instrument text, result text)"
+insert_last_result = "INSERT INTO last_result (instrument, result) values('{}','{}')"
+delete_last_result = "DELETE FROM last_result WHERE instrument = '{}'"
+get_last_result = "SELECT * FROM last_result WHERE instrument = '{}'"
+
+
 insert = "INSERT INTO quotes(instrument, code, date, open, high, low, close, vol) values(?, ?, ?, ?, ?, ?, ?, ?)"
 select_database_by_code = "SELECT * FROM quotes WHERE code= {}"
 select_last_record = "SELECT MAX(date) FROM quotes WHERE code= {}"
@@ -24,6 +31,7 @@ select_last_record = "SELECT MAX(date) FROM quotes WHERE code= {}"
 def start_database():
     cursor = con.cursor()
     cursor.execute(create_quotes)
+    cursor.execute(create_table_last_result)
     cursor.execute(create_index_code)
     cursor.execute(create_index_instrument)
     con.commit()
@@ -54,10 +62,16 @@ def upload_database_status():
     const.database_uploaded = True
 
 
-def get_latest_record(instrument_code):
+def update_last_result(instrument, updated_result):
     cur = con.cursor()
-    cur.execute(select_last_record.format(instrument_code))
-    result = cur.fetchone()[0]
-    return datetime.utcfromtimestamp(result).strftime('%Y-%m-%d %H:%M:%S')
+    cur.execute(get_last_result.format(instrument))
+    result = cur.fetchone()
+    cur.execute(delete_last_result.format(instrument))
+    cur.execute(insert_last_result.format(instrument, json.dumps(updated_result)))
+    con.commit()
+    if result != None:
+        return json.loads(result[2])
+    return result
+
 
 

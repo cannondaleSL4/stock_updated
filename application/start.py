@@ -23,6 +23,7 @@ from const import *
 from database import *
 from prepare_markup import prepare_message, result_wma_to_markup
 
+from database import update_last_result
 
 port = int(os.environ.get('PORT', 8080))
 
@@ -51,24 +52,23 @@ def execute(list_for_update):
     make_request(list_for_update, today_only=True)
     result_of_analyse = make_analyse(list_for_update)
     indicators_result = result_of_analyse.get('indicators')
+    result = indicators_result.get('wma 4 result')
     if list_for_update[0] in currency:
-        instrument_name = "currency"
-        set_currensy_result(indicators_result.get('wma 4 result'))
-        text_for_message_telegram = prepare_message(const.result_currency)
-        text_for_message_email = result_wma_to_markup(const.result_currency)
+        last_result = update_last_result("currency", result)
+        text_for_message_telegram = prepare_message(result, last_result)
+        text_for_message_email = result_wma_to_markup(result)
     else:
-        instrument_name = "stocks"
-        set_stocks_result(indicators_result.get('wma 4 result'))
-        text_for_message_telegram = prepare_message(const.result_stocks)
-        text_for_message_email = result_wma_to_markup(const.result_currency)
+        last_result = update_last_result("stocks", result)
+        text_for_message_telegram = prepare_message(result, last_result)
+        text_for_message_email = result_wma_to_markup(result)
     logging.info(text_for_message_telegram)
-    send_email(mail_username, mail_password, mail_username, instrument_name, text_for_message_email)
+    send_email(mail_username, mail_password, mail_username, text_for_message_email)
     send_telegram(text_for_message_telegram)
     logging.info("automatic job was executed at the " +
                  datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S'))
 
 
-def send_email(user, pwd, recipient, subject, body):
+def send_email(user, pwd, recipient, body):
     import smtplib
 
     FROM = user
@@ -80,7 +80,6 @@ def send_email(user, pwd, recipient, subject, body):
     message.attach(part)
 
     try:
-
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login(user, pwd)
@@ -141,7 +140,7 @@ def start_upload_database():
     create_dir("stock")
     start_database()
     # change to false for debug and true for working
-    if False:
+    if True:
         list_for_update = list(all_instruments.keys())
         make_request(list_for_update, today_only=False)
         logging.info("database was uploaded")
@@ -178,7 +177,7 @@ if __name__ == "__main__":
 
     t_2 = Thread(target=start_upload_database)
     t_2.start()
-    send_email(mail_username, mail_password, mail_username, "App was restarted", "App has been restarted")
+    send_email(mail_username, mail_password, mail_username, "App has been restarted")
     send_telegram("application has been restarted: {}"
                   .format(datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     app.run(host='0.0.0.0', port=port)

@@ -1,10 +1,6 @@
 import datetime
-from time import gmtime, strftime
-
 import pytz
 from flask import Markup
-
-from const import currency, stock_instruments
 
 
 def result_wma_to_markup(wma_result, indicator_name="WMA"):
@@ -18,20 +14,46 @@ def result_wma_to_markup(wma_result, indicator_name="WMA"):
     return Markup(result)
 
 
-def prepare_message(dict):
-    four_hours = "of(4 hours)"
-    time_period = ""
-    for key in dict:
-        if four_hours in dict.get(key):
-            time_period = "4 hours"
-            updated_key = key.replace('&', 'AND')
-            dict[updated_key] = dict.pop(key)
-            dict[updated_key] = dict.get(key).replace(four_hours, "")
-            dict[updated_key] = dict.get(key).replace("sell during:", "sell ")
-            dict[updated_key] = dict.get(key).replace("buy during:", "buy ")
+def prepare_message(dict_result, old_result):
 
-    result = "*{} {}*%0A".format(datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S'),
-                                 time_period)
-    for key in dict:
-        result += "{}:{}%0A".format(key, dict.get(key))
+    new = list()
+    droped = list()
+
+    if old_result is not None:
+        for instrument in old_result:
+            if instrument in dict_result:
+                continue
+            else:
+                new.append(instrument)
+
+        for instrument in dict_result:
+            if instrument in old_result:
+                continue
+            else:
+                droped.append(instrument)
+
+        result_dict = dict()
+
+    for items in dict_result:
+        temp = dict_result.get(items).get("4 hours")
+        temp = temp.replace('&', 'AND')
+        temp = temp.replace("sell during:", "sell ")
+        temp = temp.replace("sell during:", "sell ")
+        temp = temp.replace("periods of(4 hours)", "periods")
+        result_dict[items] = temp
+
+    result = "*{} {}*%0A".format(datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S'), "4 hours")
+    for key in result_dict:
+        result += "{}:{}%0A".format(key, result_dict.get(key))
+
+    if len(new) != 0:
+        result += "*%0A New instrument(s) is(are):*"
+        for item in new:
+            result += "%0A{}".format(item)
+
+    if len(droped) != 0:
+        result += "*%0A Instrument(s) was(were) dropped:*"
+        for item in droped:
+            result += "%0A{}".format(item)
+
     return result

@@ -8,9 +8,9 @@ from download_update import *
 from indicators_analyse import *
 from prepare_markup import *
 from const import *
-from check import check_latest_record
-
 from optimisation import get_best_params
+from database import update_last_result
+
 
 template_dir = os.path.abspath('templates')
 static_dir = os.path.abspath('static')
@@ -64,13 +64,15 @@ def currency_post():
         flash(result)
 
     if request.form['form'] == 'Analyse':
-        if len(const.result_currency) == 0:
-            result_of_analyse = make_analyse(list_for_update)
-            indicators_result = result_of_analyse.get('indicators')
-            set_currensy_result(indicators_result.get('wma 4 result'))
-        text_for_message = prepare_message(const.result_currency)
-        print(text_for_message)
-        markup_result['wma 4'] = result_wma_to_markup(const.result_currency)
+        result_of_analyse = make_analyse(list_for_update)
+        indicators_result = result_of_analyse.get('indicators')
+        result = indicators_result.get('wma 4 result')
+        last_result = update_last_result("currency", result)
+        text_for_message_telegram = prepare_message(result, last_result)
+        from start import send_telegram
+        send_telegram(text_for_message_telegram)
+        print(indicators_result.get('wma 4 result'))
+        markup_result['wma 4'] = result_wma_to_markup(result)
 
     if request.form['form'] == 'Optimize':
         get_best_params(list_for_update)
