@@ -172,6 +172,9 @@ if __name__ == "__main__":
     scheduler.add_job(clear_global_result, 'cron', hour=20, minute=19)
     scheduler.add_job(united_jobs, 'cron', hour=20, minute=20)
 
+    scheduler.add_job(clear_global_result, 'cron', hour=00, minute=19)
+    scheduler.add_job(united_jobs, 'cron', hour=00, minute=20)
+
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 

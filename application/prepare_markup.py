@@ -18,6 +18,7 @@ def prepare_message(dict_result, old_result):
 
     new = list()
     droped = list()
+    result_dict = dict()
 
     if old_result is not None:
         for instrument in old_result:
@@ -31,8 +32,6 @@ def prepare_message(dict_result, old_result):
                 continue
             else:
                 droped.append(instrument)
-
-        result_dict = dict()
 
     for items in dict_result:
         temp = dict_result.get(items).get("4 hours")
