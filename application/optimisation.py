@@ -24,12 +24,14 @@ def get_best_params():
         len(dict_of_dataframes['day'].index),
         len(dict_of_dataframes['week'].index)))
     result = dict()
-    result[instrument] = for_three_timeframe(dict_of_dataframes)
+    result[instrument], list_logs = for_three_timeframe(dict_of_dataframes)
     json_result = json.dumps(result)
     logging.info(str(json_result))
     instrument = ''.join(e for e in instrument if e.isalnum())
     with open('{}.txt'.format(instrument), 'w') as outfile:
         json.dump(str(result), outfile)
+    with open('{}_logs.txt'.format(instrument), 'w') as outfile:
+        json.dump(str(list_logs), outfile)
     logging.info("optimisation done")
 
 
@@ -38,9 +40,10 @@ def for_three_timeframe(dict_of_dataframes):
     day_dateframe = dict_of_dataframes.get("day")
     hours_4_dateframe = dict_of_dataframes.get("4 hours")
     list_of_periods = mix_fast_middle_slow()
-    result = 0
+    profit_factor = 0
     dect_of_result = dict()
-    dect_of_result[result] = 0
+    dect_of_result[profit_factor] = 0
+    list_logs = list()
 
     for w_period in list_of_periods:
         list_of_week_deals = result_with_specific_parameters(week_dateframe, w_period)
@@ -49,12 +52,13 @@ def for_three_timeframe(dict_of_dataframes):
             for hours_4_period in list_of_periods:
                 list_of_4_deals = check_for_list_of_dials(list_of_day_deal, hours_4_dateframe, hours_4_period)
                 temp_profit_factor = get_profit_factor(list_of_4_deals)
-                if temp_profit_factor > 2.5:
+                if temp_profit_factor > 3 and len(list_of_4_deals) > 10:
                     profit_factor = temp_profit_factor
                     dect_of_result[profit_factor] = {'week': w_period, 'day': d_period, '4 hours': hours_4_period}
-                    logging.info("{} was added with parameters {} and number of deals {}".format(profit_factor, dect_of_result[profit_factor], len(list_of_4_deals)))
-
-    return dect_of_result
+                    log = "{} was added with parameters {} and number of deals {}".format(profit_factor, dect_of_result[profit_factor], len(list_of_4_deals))
+                    logging.info(log)
+                    list_logs.append(log)
+    return dect_of_result[profit_factor], list_logs
 
 
 def check_for_list_of_dials(list_high_deals, day_dateframe, period):
@@ -123,9 +127,13 @@ def get_profit_factor(list_of_deals):
 
 
 def mix_fast_middle_slow():
-    fast = list(range(10, 30, 10))
-    middle = list(range(20, 100, 20))
-    slow = list(range(50, 100, 20))
+    fast = list(range(10, 30, 3))
+    middle = list(range(20, 100, 3))
+    slow = list(range(50, 200, 3))
+
+    # fast = list(range(10, 30, 20))
+    # middle = list(range(20, 100, 20))
+    # slow = list(range(50, 100, 20))
 
     result = list()
 
