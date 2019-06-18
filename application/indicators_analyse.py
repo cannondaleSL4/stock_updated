@@ -31,10 +31,11 @@ def for_three_timeframe(dict_of_dataframes, dict_of_wma):
     temp_result = dict()
     for frame_period in dict_of_dataframes:
         temp_result[frame_period] = result_in_wma(dict_of_dataframes.get(frame_period), dict_of_wma.get(frame_period))
-
-    for key in temp_result:
-        if temp_result.get(key) == 'undefined':
+        if temp_result[frame_period] == 'undefined':
             return 'undefined'
+
+    if temp_result['week'] != temp_result['day'] != temp_result['4 hours']:
+        return 'undefined'
 
     return temp_result
 
