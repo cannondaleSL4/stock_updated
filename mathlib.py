@@ -150,7 +150,7 @@ currency = {
 
 def start(instrument):
 
-    wma =  parameters_wma.get(instrument)
+    wma = parameters_wma.get(instrument)
     data = get_dataframe_of_instrument(currency.get(instrument))
     df_4 = data.get("4 hours")
     df_day = data.get("day")
