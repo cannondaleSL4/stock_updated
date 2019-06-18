@@ -1,49 +1,37 @@
+import os
+
 import pytz
 from const import all_instruments, currency
 from analyse import get_dataframe_of_instrument
 import talib
 from datetime import datetime, timedelta
 import pandas as pd
-import json 
+import json
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
 
-def get_best_params(dict_of_instruments=currency):
+def get_best_params():
+    instrument = os.getenv('INSTRUMENT')
     logging.info("Begin procedure of optimisation")
-    dict_of_results = dict()
-    for instrument in dict_of_instruments:
-        logging.info("begin optimisation parameters for {} at {}".format(instrument, datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
-        dict_of_dataframes = get_dataframe_of_instrument(instrument)
-        # dict_of_dataframes = cut_dataframes(dict_of_dataframes)
-        # dict_of_results[instrument] = get_best_parameters(dict_of_dataframes)
-        dict_of_results[instrument] = for_three_timeframe(dict_of_dataframes)
-    json_result = json.dumps(dict_of_results)
+    logging.info("begin optimisation parameters for {} at {}".format(instrument, datetime.now(
+        pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
+    dict_of_dataframes = get_dataframe_of_instrument(instrument)
+    dict_of_dataframes = cut_dataframes(dict_of_dataframes)
+    logging.info("sizes for optimisation are {}/4 hours. {}/days. {}/weeks"
+        .format(
+        len(dict_of_dataframes['4 hours'].index),
+        len(dict_of_dataframes['day'].index),
+        len(dict_of_dataframes['week'].index)))
+    result = dict()
+    result[instrument] = for_three_timeframe(dict_of_dataframes)
+    json_result = json.dumps(result)
     logging.info(str(json_result))
-
-
-def cut_dataframes(dataframes):
-
-    cut_4_hours = dataframes.get('4 hours').index.searchsorted(datetime.now() - timedelta(days=(365*1)))
-    cut_day = dataframes.get('day').index.searchsorted(datetime.now() - timedelta(days=(365*2)))
-    cut_week = dataframes.get('week').index.searchsorted(datetime.now() - timedelta(days=(365*3)))
-
-    dataframes['4 hours'] = dataframes.get('4 hours').iloc[cut_4_hours:]
-    dataframes['day'] = dataframes.get('day').iloc[cut_day:]
-    dataframes['week'] = dataframes.get('week').iloc[cut_week:]
-
-    return dataframes
-
-
-def get_best_parameters(dict_of_dataframes):  
-    dict_of_results = dict()
-    
-    for time_period in dict_of_dataframes:
-        logging.info("begin optimisation for {} timeperiod at {}".format(time_period, datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
-        dict_of_results[time_period] = search_in_dateframe(dict_of_dataframes.get(time_period))
-    
-    return dict_of_results
+    instrument = ''.join(e for e in instrument if e.isalnum())
+    with open('{}.txt'.format(instrument), 'w') as outfile:
+        json.dump(str(result), outfile)
+    logging.info("optimisation done")
 
 
 def for_three_timeframe(dict_of_dataframes):
@@ -51,40 +39,45 @@ def for_three_timeframe(dict_of_dataframes):
     day_dateframe = dict_of_dataframes.get("day")
     hours_4_dateframe = dict_of_dataframes.get("4 hours")
     list_of_periods = mix_fast_middle_slow()
+    profit_factor = 1
     result = 0
     dect_of_result = dict()
     dect_of_result[result] = 0
 
     for w_period in list_of_periods:
         list_of_week_deals = result_with_specific_parameters(week_dateframe, w_period)
-        for week_deal in list_of_week_deals:
-            for d_period in list_of_periods:
-                begin_of_deal = day_dateframe.index.searchsorted(datetime.fromtimestamp(week_deal.dataframe.index[0].timestamp()))
-                end_of_deal = day_dateframe.index.searchsorted(datetime.fromtimestamp(week_deal.dataframe.index[-1].timestamp()))
+        for d_period in list_of_periods:
+            list_of_days_deals = list()
+            for week_deal in list_of_week_deals:
+                begin_of_deal = day_dateframe.index.searchsorted(
+                    datetime.fromtimestamp(week_deal.dataframe.index[0].timestamp()))
+                end_of_deal = day_dateframe.index.searchsorted(
+                    datetime.fromtimestamp(week_deal.dataframe.index[-1].timestamp()))
 
-                list_of_day_deals = result_with_specific_parameters(day_dateframe.iloc[begin_of_deal+1:end_of_deal+1], d_period)
-    return "test"
+                temp_day_deals = result_with_specific_parameters(
+                    day_dateframe.iloc[begin_of_deal + 1:end_of_deal + 1], d_period)
 
+                list_of_days_deals.extend(temp_day_deals)
 
+            for hour_4_period in list_of_periods:
+                list_of_4_hours_deals = list()
+                for day_deal in list_of_days_deals:
+                    begin_of_deal_4 = hours_4_dateframe.index.searchsorted(
+                        datetime.fromtimestamp(day_deal.dataframe.index[0].timestamp()))
+                    end_of_deal_4 = hours_4_dateframe.index.searchsorted(
+                        datetime.fromtimestamp(day_deal.dataframe.index[-1].timestamp()))
 
-def search_in_dateframe(dateframe):
-    result = 0
-    list_of_periods = mix_fast_middle_slow()
-    count = len(list_of_periods)
-    counter = 0
-    dect_of_result = dict()
-    dect_of_result[result] = 0
-    logging.info("size of array with wma variants is {}". format(count))
-    for period in list_of_periods:
-        counter = counter + 1
-        list_of_deals = result_with_specific_parameters(dateframe, period)
-        temp_result = get_profit_factor(list_of_deals)
-        if temp_result > 1 and result < temp_result:
-            result = temp_result
-            dect_of_result[result] = period
-        if counter % 200 == 0:
-            logging.info("percent {}% passed ".format(round((counter/count)*100)))
-    return dect_of_result.get(result)
+                    temp_4_hours_deals = result_with_specific_parameters(
+                        hours_4_dateframe.iloc[begin_of_deal_4 + 1:end_of_deal_4 + 1], hour_4_period)
+
+                    list_of_4_hours_deals.extend(temp_4_hours_deals)
+
+                temp_profit_factor = get_profit_factor(list_of_4_hours_deals)
+                if temp_profit_factor > profit_factor:
+                    profit_factor = temp_profit_factor
+                    dect_of_result[profit_factor] = {'week': w_period, 'day': d_period, '4 hours': hour_4_period}
+
+    return dect_of_result.get(profit_factor)
 
 
 def result_with_specific_parameters(dateframe, array_of_wma_parametrs):
@@ -110,15 +103,13 @@ def result_with_specific_parameters(dateframe, array_of_wma_parametrs):
         if result == 'undefined' and end_index != "" and start_index != "":  # it's the end of deal
             deal = Deal(
                 dateframe.iloc[dateframe.index.searchsorted(datetime.fromtimestamp(start_index.timestamp())):
-                               dateframe.index.searchsorted(datetime.fromtimestamp(end_index.timestamp()))+1],
+                               dateframe.index.searchsorted(datetime.fromtimestamp(end_index.timestamp())) + 1],
                 buy_or_sell)
             list_of_deals.append(deal)
             start_index = ""
             end_index = ""
             buy_or_sell = ""
 
-    # return sum(c.result_of_deal for c in list_of_deals)
-    # return get_profit_factor(list_of_deals)
     return list_of_deals
 
 
@@ -164,8 +155,19 @@ def in_market(data_slice, fast_period, middle_period, slow_period):
     return 'undefined'
 
 
-class Deal:
+def cut_dataframes(dataframes):
+    cut_4_hours = dataframes.get('4 hours').index.searchsorted(datetime.now() - timedelta(days=(365 * 1)))
+    cut_day = dataframes.get('day').index.searchsorted(datetime.now() - timedelta(days=(365 * 2)))
+    cut_week = dataframes.get('week').index.searchsorted(datetime.now() - timedelta(days=(365 * 3)))
 
+    dataframes['4 hours'] = dataframes.get('4 hours').iloc[cut_4_hours:]
+    dataframes['day'] = dataframes.get('day').iloc[cut_day:]
+    dataframes['week'] = dataframes.get('week').iloc[cut_week:]
+
+    return dataframes
+
+
+class Deal:
     result_of_deal = 0
     dataframe = pd.DataFrame()
     buy_or_sell = ""

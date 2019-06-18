@@ -318,7 +318,7 @@ stock_instruments.update(stocks_instruments)
 stock_instruments.update(index_instruments)
 
 all_instruments = {}
-all_instruments.update(stock_instruments)
+# all_instruments.update(stock_instruments)
 all_instruments.update(currency)
 
 
