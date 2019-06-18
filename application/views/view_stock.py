@@ -67,11 +67,11 @@ def stock_post():
         result_of_analyse = make_analyse(list_for_update)
         indicators_result = result_of_analyse.get('indicators')
         result = indicators_result.get('wma 4 result')
-        last_result = update_last_result("stock", result)
-        text_for_message_telegram = prepare_message(result, last_result)
-        from start import send_telegram
+        # last_result = update_last_result("stock", result)
+        # text_for_message_telegram = prepare_message(result, last_result)
+        # from start import send_telegram
         # send_telegram(text_for_message_telegram)
-        print(indicators_result.get('wma 4 result'))
+        # print(indicators_result.get('wma 4 result'))
         markup_result['wma 4'] = result_wma_to_markup(result)
 
     return render_template('stocks.html',

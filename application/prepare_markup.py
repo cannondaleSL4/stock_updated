@@ -25,21 +25,20 @@ def prepare_message(dict_result, old_result):
             if instrument in dict_result:
                 continue
             else:
-                new.append(instrument)
+                droped.append(instrument)
 
         for instrument in dict_result:
             if instrument in old_result:
                 continue
             else:
-                droped.append(instrument)
+                new.append(instrument)
 
     for items in dict_result:
         temp = dict_result.get(items).get("4 hours")
-        temp = temp.replace('&', 'AND')
         temp = temp.replace("sell during:", "sell ")
         temp = temp.replace("sell during:", "sell ")
         temp = temp.replace("periods of(4 hours)", "periods")
-        result_dict[items] = temp
+        result_dict[items.replace('&', 'and')] = temp
 
     result = "*{} {}*%0A".format(datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S'), "4 hours")
     for key in result_dict:
