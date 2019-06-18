@@ -12,7 +12,7 @@ For using application:
 
 Or just use docker 
 
-2.1 `docker build --network host -t my-quotes .`
+2.1 `docker build --network host -t my-quotes-opt-3-frames .`
 
 2.2 `docker run -itd --name my-quotes --net=host -p 8080:8080 my-quotes -e MAIL_USERNAME="${MAIL_USERNAME}" -e MAIL_PASSWORD="${MAIL_PASSWORD}"`
 

@@ -18,7 +18,7 @@ def get_best_params():
     logging.info("begin optimisation parameters for {} at {}".format(instrument, datetime.now(
         pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     dict_of_dataframes = get_dataframe_of_instrument(instrument)
-    dict_of_dataframes = cut_dataframes(dict_of_dataframes)
+    # dict_of_dataframes = cut_dataframes(dict_of_dataframes)
     logging.info("sizes for optimisation are {}/4 hours. {}/days. {}/weeks"
         .format(
         len(dict_of_dataframes['4 hours'].index),
@@ -39,7 +39,6 @@ def for_three_timeframe(dict_of_dataframes):
     day_dateframe = dict_of_dataframes.get("day")
     hours_4_dateframe = dict_of_dataframes.get("4 hours")
     list_of_periods = mix_fast_middle_slow()
-    profit_factor = 1
     result = 0
     dect_of_result = dict()
     dect_of_result[result] = 0
@@ -47,37 +46,33 @@ def for_three_timeframe(dict_of_dataframes):
     for w_period in list_of_periods:
         list_of_week_deals = result_with_specific_parameters(week_dateframe, w_period)
         for d_period in list_of_periods:
-            list_of_days_deals = list()
-            for week_deal in list_of_week_deals:
-                begin_of_deal = day_dateframe.index.searchsorted(
-                    datetime.fromtimestamp(week_deal.dataframe.index[0].timestamp()))
-                end_of_deal = day_dateframe.index.searchsorted(
-                    datetime.fromtimestamp(week_deal.dataframe.index[-1].timestamp()))
-
-                temp_day_deals = result_with_specific_parameters(
-                    day_dateframe.iloc[begin_of_deal + 1:end_of_deal + 1], d_period)
-
-                list_of_days_deals.extend(temp_day_deals)
-
-            for hour_4_period in list_of_periods:
-                list_of_4_hours_deals = list()
-                for day_deal in list_of_days_deals:
-                    begin_of_deal_4 = hours_4_dateframe.index.searchsorted(
-                        datetime.fromtimestamp(day_deal.dataframe.index[0].timestamp()))
-                    end_of_deal_4 = hours_4_dateframe.index.searchsorted(
-                        datetime.fromtimestamp(day_deal.dataframe.index[-1].timestamp()))
-
-                    temp_4_hours_deals = result_with_specific_parameters(
-                        hours_4_dateframe.iloc[begin_of_deal_4 + 1:end_of_deal_4 + 1], hour_4_period)
-
-                    list_of_4_hours_deals.extend(temp_4_hours_deals)
-
-                temp_profit_factor = get_profit_factor(list_of_4_hours_deals)
-                if temp_profit_factor > profit_factor:
+            list_of_day_deal = check_for_list_of_dials(list_of_week_deals, day_dateframe, d_period)
+            for hours_4_period in list_of_periods:
+                list_of_4_deals = check_for_list_of_dials(list_of_day_deal, hours_4_dateframe, hours_4_period)
+                temp_profit_factor = get_profit_factor(list_of_4_deals)
+                if temp_profit_factor > 2.5:
                     profit_factor = temp_profit_factor
-                    dect_of_result[profit_factor] = {'week': w_period, 'day': d_period, '4 hours': hour_4_period}
+                    dect_of_result[profit_factor] = {'week': w_period, 'day': d_period, '4 hours': hours_4_period}
+                    logging.info("{} was added with parameters {} and number of deals {}".format(profit_factor, dect_of_result[profit_factor], len(list_of_4_deals)))
 
-    return dect_of_result.get(profit_factor)
+    return dect_of_result
+
+
+def check_for_list_of_dials(list_high_deals, day_dateframe, period):
+    list_of_deals = list()
+    for deal in list_high_deals:
+        begin_of_deal = day_dateframe.index.searchsorted(
+                        datetime.fromtimestamp(deal.dataframe.index[0].timestamp()))
+        end_of_deal = day_dateframe.index.searchsorted(
+            datetime.fromtimestamp(deal.dataframe.index[-1].timestamp()))
+
+        temp_day_deals = result_with_specific_parameters(
+            day_dateframe.iloc[begin_of_deal + 1:end_of_deal + 1], period)
+
+        for low_deal in temp_day_deals:
+            if deal.buy_or_sell == low_deal.buy_or_sell:
+                list_of_deals.append(low_deal)
+    return list_of_deals
 
 
 def result_with_specific_parameters(dateframe, array_of_wma_parametrs):
@@ -129,9 +124,9 @@ def get_profit_factor(list_of_deals):
 
 
 def mix_fast_middle_slow():
-    fast = list(range(10, 30, 3))
-    middle = list(range(20, 100, 3))
-    slow = list(range(50, 200, 3))
+    fast = list(range(10, 30, 10))
+    middle = list(range(20, 100, 20))
+    slow = list(range(50, 100, 20))
 
     result = list()
 
