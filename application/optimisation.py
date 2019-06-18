@@ -18,7 +18,6 @@ def get_best_params():
     logging.info("begin optimisation parameters for {} at {}".format(instrument, datetime.now(
         pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     dict_of_dataframes = get_dataframe_of_instrument(instrument)
-    # dict_of_dataframes = cut_dataframes(dict_of_dataframes)
     logging.info("sizes for optimisation are {}/4 hours. {}/days. {}/weeks"
         .format(
         len(dict_of_dataframes['4 hours'].index),
