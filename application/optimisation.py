@@ -158,9 +158,9 @@ def in_market(data_slice, fast_period, middle_period, slow_period):
 
 
 def cut_dataframes(dataframes):
-    cut_4_hours = dataframes.get('4 hours').index.searchsorted(datetime.now() - timedelta(days=(365 * 1)))
-    cut_day = dataframes.get('day').index.searchsorted(datetime.now() - timedelta(days=(365 * 2)))
-    cut_week = dataframes.get('week').index.searchsorted(datetime.now() - timedelta(days=(365 * 3)))
+    cut_4_hours = dataframes.get('4 hours').index.searchsorted(datetime.now() - timedelta(days=(365 * 4)))
+    cut_day = dataframes.get('day').index.searchsorted(datetime.now() - timedelta(days=(365 * 4)))
+    cut_week = dataframes.get('week').index.searchsorted(datetime.now() - timedelta(days=(365 * 4)))
 
     dataframes['4 hours'] = dataframes.get('4 hours').iloc[cut_4_hours:]
     dataframes['day'] = dataframes.get('day').iloc[cut_day:]
