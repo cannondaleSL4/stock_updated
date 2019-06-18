@@ -122,8 +122,8 @@ def get_profit_factor(list_of_deals):
 
 def mix_fast_middle_slow():
     fast = list(range(10, 30, 3))
-    middle = list(range(20, 100, 3))
-    slow = list(range(50, 200, 3))
+    middle = list(range(20, 70, 3))
+    slow = list(range(50, 110, 3))
 
     result = list()
 

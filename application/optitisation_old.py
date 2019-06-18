@@ -26,11 +26,11 @@ def get_best_params(dict_of_instruments=currency):
         len(dict_of_dataframes['4 hours'].index),
         len(dict_of_dataframes['day'].index),
         len(dict_of_dataframes['week'].index)))
-    inner_dict['week'] = get_best_parameters(dict_of_dataframes.get("week"))
+    inner_dict['week'] = search_in_dateframe(dict_of_dataframes.get("week"), "week")
     logging.info(json.dumps(inner_dict['week']))
-    inner_dict['day'] = get_best_parameters(dict_of_dataframes.get("day"))
+    inner_dict['day'] = search_in_dateframe(dict_of_dataframes.get("day"), "day")
     logging.info(json.dumps(inner_dict['day']))
-    inner_dict['4 hours'] = get_best_parameters(dict_of_dataframes.get("4 hours"))
+    inner_dict['4 hours'] = search_in_dateframe(dict_of_dataframes.get("4 hours"), "4 hours")
     logging.info(json.dumps(inner_dict['4 hours']))
     dict_of_results[instrument] = inner_dict
     json_result = json.dumps(dict_of_results)
@@ -54,31 +54,23 @@ def cut_dataframes(dataframes):
     return dataframes
 
 
-def get_best_parameters(dict_of_dataframes):
-
-    return search_in_dateframe(dict_of_dataframes)
-
-
-def search_in_dateframe(dateframe):
+def search_in_dateframe(dateframe, time_period):
     result = 0
     list_of_periods = mix_fast_middle_slow()
     count = len(list_of_periods)
-    counter = 0
     dect_of_result = dict()
     dect_of_result[result] = 0
     logging.info("size of array with wma variants is {}". format(count))
     for period in list_of_periods:
         counter = counter + 1
-        temp_result = result_with_specific_parameters(dateframe, period)
+        temp_result = result_with_specific_parameters(dateframe, period, time_period)
         if temp_result > 1 and result < temp_result:
             result = temp_result
             dect_of_result[result] = period
-        if counter % 200 == 0:
-            logging.info("percent {}% passed ".format(round((counter/count)*100)))
     return dect_of_result.get(result)
 
 
-def result_with_specific_parameters(dateframe, array_of_wma_parametrs):
+def result_with_specific_parameters(dateframe, array_of_wma_parametrs, time_period):
     list_of_deals = list()
     counter = 0
     temp_fast = array_of_wma_parametrs[0]
@@ -107,8 +99,10 @@ def result_with_specific_parameters(dateframe, array_of_wma_parametrs):
             start_index = ""
             end_index = ""
             buy_or_sell = ""
-
-    return get_profit_factor(list_of_deals)
+    pf = get_profit_factor(list_of_deals)
+    if pf > 2:
+        logging.info("Number of deals is {} and profit factor is {} for time frame ({}) and {}".format(len(list_of_deals), pf, time_period, array_of_wma_parametrs))
+    return pf
 
 
 def get_profit_factor(list_of_deals):
@@ -128,8 +122,8 @@ def get_profit_factor(list_of_deals):
 
 def mix_fast_middle_slow():
     fast = list(range(10, 30, 3))
-    middle = list(range(20, 100, 3))
-    slow = list(range(50, 200, 3))
+    middle = list(range(20, 70, 3))
+    slow = list(range(50, 110, 3))
 
     result = list()
 

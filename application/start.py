@@ -16,7 +16,7 @@ from const import *
 from database import *
 from prepare_markup import prepare_message
 
-from optimisation import get_best_params
+from application.optitisation_old import get_best_params
 
 logging.basicConfig(level=logging.INFO)
 port = int(os.environ.get('PORT', 8080))
