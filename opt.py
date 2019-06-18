@@ -82,7 +82,7 @@ def extract_tar(path):
 def check_container_is_running(list_of_containers, list_of_instrument):
     for docker_container in list_of_containers:
         logs = docker_container.logs()
-        if "optimisation.py done" in str(logs):
+        if "optimisation done" in str(logs):
             for instrument in list_of_instrument:
                 temp_inst = ''.join(e for e in instrument if e.isalnum())
                 try:
