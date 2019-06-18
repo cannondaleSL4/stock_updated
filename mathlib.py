@@ -1,22 +1,20 @@
-import numpy as np
 import talib
-import pandas as pd
-import tensorflow as tf
 import sqlite3
 import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
-import tensorflow as tf # This code has been tested with TensorFlow 1.6
-from sklearn.preprocessing import MinMaxScaler
+
 
 select_database_by_code = "SELECT * FROM quotes WHERE code= {}"
 con = sqlite3.connect("{}/test_stocks/stock/application/quotes.db".format(str(Path.home())), check_same_thread=False)
+
 
 def select_from_database(instrument_code):
     df = pd.read_sql_query(select_database_by_code.format(instrument_code), con, index_col='date', parse_dates=['date'])
     df.index = pd.to_datetime(df.index, unit='s')
     df.drop('id', axis=1, inplace=True)
     return df
+
 
 def get_dataframe_of_instrument(code):
 
@@ -46,7 +44,6 @@ def get_dataframe_of_instrument(code):
     data_4_hours["close"] = data_hour.close.resample('4H').last().dropna(how='any')
     data_4_hours["vol"] = data_hour.vol.resample('4H').sum().dropna(how='any')
 
-    # return [data_4_hours, data_day, data_week]
     return {'4 hours': data_4_hours, 'day': data_day, 'week': data_week}
 
 def print_plot(fast,middle,slow, period, instrument):
