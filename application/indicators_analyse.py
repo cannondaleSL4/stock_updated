@@ -34,10 +34,10 @@ def for_three_timeframe(dict_of_dataframes, dict_of_wma):
         if temp_result[frame_period] == 'undefined':
             return 'undefined'
 
-    if ("sell" in temp_result['week']) and ("sell" in temp_result['day']) and ("sell" in temp_result['4 hours']):
+    if ("sell" in temp_result['week']) and ("sell" in temp_result['4 hours']):
         return temp_result
 
-    if ("buy" in temp_result['week']) and ("buy" in temp_result['day']) and ("buy" in temp_result['4 hours']):
+    if ("buy" in temp_result['week']) and ("buy" in temp_result['4 hours']):
         return temp_result
 
     return 'undefined'

@@ -66,7 +66,6 @@ def for_three_timeframe(dict_of_dataframes):
     return "test"
 
 
-
 def search_in_dateframe(dateframe):
     result = 0
     list_of_periods = mix_fast_middle_slow()
