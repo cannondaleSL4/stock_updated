@@ -14,7 +14,9 @@ def result_wma_to_markup(wma_result, indicator_name="WMA"):
     return Markup(result)
 
 
-def prepare_message(dict_result, old_result):
+def prepare_message(indicators_result, old_result):
+    dict_result = indicators_result.get('wma 4 result')
+    result_pattern = indicators_result.get('pattern')
 
     new = list()
     droped = list()
@@ -53,5 +55,15 @@ def prepare_message(dict_result, old_result):
         result += "*%0A Instrument(s) was(were) dropped:*"
         for item in droped:
             result += "%0A{}".format(item)
+
+    if bool(result_pattern):
+        result += "*And let's play russian roulette:*%0A"
+        for pattern in result_pattern:
+            inner_dict = result_pattern.get(pattern)
+            result += "%0A"
+            for any_pattern in inner_dict:
+                temp = "{} {}: {}%0A".format(pattern, any_pattern, inner_dict.get(any_pattern))
+                temp = temp.replace('&', 'and')
+                result += temp
 
     return result

@@ -11,6 +11,7 @@ default_dict_wma = {"week": [10, 20, 50], "day": [10, 20, 50], "4 hours": [10, 2
 def indicators_make_analyse(dict_of_dataframes):
     results = dict()
     wma_4_result = dict()
+    pattern_result_dict = dict()
 
     for instrument in dict_of_dataframes:
         if not parameters_wma.get(instrument):
@@ -22,7 +23,13 @@ def indicators_make_analyse(dict_of_dataframes):
         if result != 'undefined':
             wma_4_result[instrument] = result
 
+        pattern_result = model(dict_of_dataframes.get(instrument))
+
+        if pattern_result != 'undefined':
+            pattern_result_dict[instrument] = pattern_result
+
     results['wma 4 result'] = wma_4_result
+    results['pattern'] = pattern_result_dict
 
     return results
 
@@ -158,3 +165,76 @@ def merge_bbands_stochastic(data):
     if bbands_result != 'undefined':
         return result_stochastic(data)
     return 'undefined'
+
+
+def model(dataframes):
+    dict_of_result = dict()
+    for time_period in dataframes:
+        # поглощение
+        dataframe = dataframes.get(time_period)
+        engulfing = talib.CDLENGULFING(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        if engulfing.T[-1] == -100:
+            dict_of_result[str(time_period) + " engulfing"] = "sell"
+        if engulfing.T[-1] == 100:
+            dict_of_result[str(time_period) + " engulfing"] = "buy"
+
+        # # it's up
+        # hammer = talib.CDLHAMMER(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        #
+        # if hammer.T[-1] != 0:
+        #     dict_of_result[str(time_period) + " hummer"] = "buy"
+
+        # # it's up
+        # inverted_hammer = talib.CDLINVERTEDHAMMER(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        # if inverted_hammer.T[-1] != 0:
+        #     dict_of_result[str(time_period) + " inverted hummer"] = "buy"
+
+        #it's up
+        three_white_solders = talib.CDL3WHITESOLDIERS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        if three_white_solders.T[-1] != 0:
+            dict_of_result[str(time_period) + " three white solders"] = "buy"
+
+        #it's up
+        morning_star = talib.CDLMORNINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        if morning_star.T[-1] != 0:
+            dict_of_result[str(time_period) + " morning star"] = "buy"
+
+        #it's up
+        three_star_south = talib.CDL3STARSINSOUTH(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        if three_star_south.T[-1] != 0:
+            dict_of_result[str(time_period) + " three star south"] = "buy"
+
+
+        #it's down
+        shooting_star = talib.CDLSHOOTINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        if shooting_star.T[-1] != 0:
+            dict_of_result[str(time_period) + " shooting star"] = "sell"
+
+        #it's down
+        evening_star = talib.CDLEVENINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        if evening_star.T[-1] != 0:
+            dict_of_result[str(time_period) + " evening star"] = "sell"
+
+        #lt's down
+        three_black_crows = talib.CDL3BLACKCROWS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        if three_black_crows.T[-1] != 0:
+            dict_of_result[str(time_period) + " three black crows"] = "sell"
+
+        # #it's down
+        # handing_man = talib.CDLHANGINGMAN(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+
+        # if handing_man.T[-1] != 0:
+        #     dict_of_result[str(time_period) + " handing man"] = "sell"
+
+    if not bool(dict_of_result):
+        return 'undefined'
+
+    return dict_of_result
+
