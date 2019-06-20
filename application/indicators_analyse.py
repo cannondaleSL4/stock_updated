@@ -62,14 +62,14 @@ def result_in_wma(data, list_of_wma):
         period = "4 hours"
 
     if period == "4 hours":
-        if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]):
+        if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]) and (data.close[-1] > fast[-1]):
             for i in range(1, 100):
-                if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i])):
+                if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i]) and (data.close[-1] > fast[-1])):
                     return 'buy during:{} periods of({})'.format(i, period)
 
-        if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]):
+        if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]) and (data.close[-1] < fast[-1]):
             for i in range(1, 100):
-                if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i])):
+                if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i]) and (data.close[-1] < fast[-1])):
                     return 'sell during:{} periods of({})'.format(i, period)
     else:
         if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]):
