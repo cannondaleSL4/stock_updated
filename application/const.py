@@ -301,7 +301,7 @@ parameters_wma = {
     'Aud/Chf': {'week': (16,32,62), 'day': (16,20,50), '4 hours': (10,32,53)},
     'Aud/Jpy': {'week': (19,35,62), 'day': (16,26,68), '4 hours': (10,20,50)},
     'Aud/Nzd': {'week': (10,20,50), 'day': (19,29,65), '4 hours': (10,20,50)},
-    'Wells Fargo': {'week': (10, 20, 50), 'day': (10, 20, 50), '4 hours': (10, 20, 50),
+    'Wells Fargo': {'week': (10, 20, 50), 'day': (10, 20, 50), '4 hours': (10, 20, 50)},
     'Wal-Mart Stores': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)},
     'Walt Disney': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)},
     'McDonalds': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)},
@@ -333,7 +333,7 @@ parameters_wma = {
     'Microsoft Corp': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)},
     'Hewlett-Packard': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)},
     'NVIDIA Corp': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)},
-    'Starbucks Corp': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)}}
+    'Starbucks Corp': {'week': (10,20,50), 'day': (10,20,50), '4 hours': (10,20,50)}
 }
 
 UPLOAD_FOLDER = ""
