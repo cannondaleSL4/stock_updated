@@ -36,10 +36,13 @@ def currency_page():
 def currency_post():
     markup_result = dict()
     list_for_update = list(currency.keys())
+    list_for_update.extend(list(goods.keys()))
     if request.form['form'] == 'Upload data':
         create_dir("currency")
+        create_dir("goods")
         if len(request.form.getlist('instr')) == 0:
             clear_dir("currency")
+            clear_dir("goods")
             result = "upload all instruments has been executed"
         else:
             list_for_update = request.form.getlist('instr')
@@ -49,8 +52,10 @@ def currency_post():
         flash(result)
     if request.form['form'] == 'Update data':
         create_dir("currency")
+        create_dir("goods")
         if len(request.form.getlist('instr')) == 0:
             clear_dir("currency")
+            clear_dir("goods")
             result = "update all instruments has been executed"
         else:
             list_for_update = request.form.getlist('instr')
@@ -61,6 +66,8 @@ def currency_post():
     if request.form['form'] == 'Clear':
         create_dir("currency")
         clear_dir("currency")
+        create_dir("goods")
+        clear_dir("goods")
         result = "all data has been clear from {}/currency".format(UPLOAD_FOLDER)
         flash(result)
 
@@ -70,9 +77,9 @@ def currency_post():
         result = indicators_result.get('wma 4 result')
         result_pattern = indicators_result.get('pattern')
         last_result = update_last_result("currency", result)
-        # text_for_message_telegram = prepare_message(indicators_result, last_result)
-        # from start import send_telegram
-        # send_telegram(text_for_message_telegram)
+        text_for_message_telegram = prepare_message(indicators_result, last_result)
+        from start import send_telegram
+        send_telegram(text_for_message_telegram)
         print(result)
         print(result_pattern)
         markup_result['wma 4'] = result_wma_to_markup(result)

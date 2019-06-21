@@ -57,7 +57,7 @@ def prepare_message(indicators_result, old_result):
             result += "%0A{}".format(item)
 
     if bool(result_pattern):
-        result += "*And let's play russian roulette:*%0A"
+        result += "*%0AAnd let's play russian roulette:*%0A"
         for pattern in result_pattern:
             inner_dict = result_pattern.get(pattern)
             result += "%0A"

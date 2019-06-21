@@ -27,7 +27,13 @@ market_codes = {
     'stocks': 25,
     'usa industry': 27,
     'etf': 28,
-    'currency': 5
+    'currency': 5,
+    'goods': 24
+}
+
+goods = {
+    'brent': 19473,
+    'gold': 18953
 }
 
 # market code - 27
@@ -347,9 +353,13 @@ stock_instruments = {}
 stock_instruments.update(stocks_instruments)
 stock_instruments.update(index_instruments)
 
+goods_instrument = {}
+goods_instrument.update(goods)
+
 all_instruments = {}
 all_instruments.update(stock_instruments)
 all_instruments.update(currency)
+all_instruments.update(goods_instrument)
 
 
 def init():

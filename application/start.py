@@ -53,7 +53,7 @@ def execute(list_for_update):
     result_of_analyse = make_analyse(list_for_update)
     indicators_result = result_of_analyse.get('indicators')
     wma_result = indicators_result.get('wma 4 result')
-    if list_for_update[0] in currency:
+    if list_for_update[0] in currency or list_for_update[0] in goods:
         last_result = update_last_result("currency", wma_result)
         text_for_message_telegram = prepare_message(indicators_result, last_result)
         text_for_message_email = result_wma_to_markup(wma_result)
@@ -110,6 +110,7 @@ def run_job_stock():
 def run_job_currency():
     if working_period():
         list_for_update = list(currency.keys())
+        list_for_update.append(goods.keys())
         execute(list_for_update)
 
 

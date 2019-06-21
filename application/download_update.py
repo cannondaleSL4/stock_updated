@@ -34,9 +34,12 @@ def make_request(list_for_update, today_only=True):
             execute_request(instrument, market_codes.get('etf'), "stock", today_only)
         elif instrument in currency:
             execute_request(instrument, market_codes.get('currency'), "currency", today_only)
+        elif instrument in goods:
+            execute_request(instrument, market_codes.get('goods'), "goods", today_only)
 
     clear_dir("currency")
     clear_dir("stock")
+    clear_dir("goods")
 
 
 def execute_request(instrument, market_code, instrument_dir, today_only):
@@ -44,10 +47,12 @@ def execute_request(instrument, market_code, instrument_dir, today_only):
                                                        datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     path_to_dir = UPLOAD_FOLDER + "/" + instrument_dir
     file_instrument_name = instrument.replace(" ", "_").replace("&", "_").replace("/", "_") + "_"
-    if instrument in stock_instruments.keys():
+    if instrument in stock_instruments:
         instrument_code = str(stock_instruments.get(instrument))
-    elif instrument in currency.keys():
+    elif instrument in currency:
         instrument_code = str(currency.get(instrument))
+    elif instrument in goods:
+        instrument_code = str(goods.get(instrument))
     else:
         logging.info("Some bad happens")
         return

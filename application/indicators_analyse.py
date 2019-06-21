@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import numpy as np
 import talib
 import logging
@@ -172,11 +174,11 @@ def model(dataframes):
     for time_period in dataframes:
         # поглощение
         dataframe = dataframes.get(time_period)
-        engulfing = talib.CDLENGULFING(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        if engulfing.T[-1] == -100:
-            dict_of_result[str(time_period) + " engulfing"] = "sell"
-        if engulfing.T[-1] == 100:
-            dict_of_result[str(time_period) + " engulfing"] = "buy"
+        # engulfing = talib.CDLENGULFING(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        # if engulfing.T[-1] == -100:
+        #     dict_of_result[str(time_period) + " engulfing"] = "sell"
+        # if engulfing.T[-1] == 100:
+        #     dict_of_result[str(time_period) + " engulfing"] = "buy"
 
         # # it's up
         # hammer = talib.CDLHAMMER(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
@@ -191,38 +193,58 @@ def model(dataframes):
         #     dict_of_result[str(time_period) + " inverted hummer"] = "buy"
 
         #it's up
-        three_white_solders = talib.CDL3WHITESOLDIERS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        try:
+            three_white_solders = talib.CDL3WHITESOLDIERS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        except:
+            logging.info("could not execute analyse for three white solders")
 
         if three_white_solders.T[-1] != 0:
             dict_of_result[str(time_period) + " three white solders"] = "buy"
 
         #it's up
-        morning_star = talib.CDLMORNINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        try:
+            morning_star = talib.CDLMORNINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        except:
+            logging.info("could not execute analyse for morning star")
 
         if morning_star.T[-1] != 0:
             dict_of_result[str(time_period) + " morning star"] = "buy"
 
         #it's up
-        three_star_south = talib.CDL3STARSINSOUTH(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        try:
+            three_star_south = talib.CDL3STARSINSOUTH(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        except:
+            logging.info("could not execute analyse for three star south")
+
 
         if three_star_south.T[-1] != 0:
             dict_of_result[str(time_period) + " three star south"] = "buy"
 
 
         #it's down
-        shooting_star = talib.CDLSHOOTINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        try:
+            shooting_star = talib.CDLSHOOTINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        except:
+            logging.info("could not execute analyse for three shooting star")
+
 
         if shooting_star.T[-1] != 0:
             dict_of_result[str(time_period) + " shooting star"] = "sell"
 
         #it's down
-        evening_star = talib.CDLEVENINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        try:
+            evening_star = talib.CDLEVENINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        except:
+            logging.info("could not execute analyse for three evening star")
 
         if evening_star.T[-1] != 0:
             dict_of_result[str(time_period) + " evening star"] = "sell"
 
         #lt's down
-        three_black_crows = talib.CDL3BLACKCROWS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        try:
+            three_black_crows = talib.CDL3BLACKCROWS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
+        except:
+            logging.info("could not execute analyse for three three black crows")
 
         if three_black_crows.T[-1] != 0:
             dict_of_result[str(time_period) + " three black crows"] = "sell"
