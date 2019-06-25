@@ -18,8 +18,8 @@ view_stock = Blueprint('view_stock', __name__, template_folder=template_dir, sta
 
 @view_stock.route("/stock")
 def stock_page():
-    if not const.database_uploaded:
-        flash("Please waiting database still uploading")
+    # if not const.database_uploaded:
+    #     flash("Please waiting database still uploading")
 
     return render_template('stocks.html',
                            first_page="/", second_page="",

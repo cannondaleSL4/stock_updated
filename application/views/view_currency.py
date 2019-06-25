@@ -22,8 +22,8 @@ view_currency = Blueprint('view_currency', __name__, template_folder=template_di
 
 @view_currency.route("/")
 def currency_page():
-    if not const.database_uploaded:
-        flash("Please waiting database still uploading")
+    # if not const.database_uploaded:
+    #     flash("Please waiting database still uploading")
 
     return render_template('currency.html',
                            first_page="", second_page="/stock",
@@ -77,9 +77,9 @@ def currency_post():
         result = indicators_result.get('wma 4 result')
         result_pattern = indicators_result.get('pattern')
         last_result = update_last_result("currency", result)
-        text_for_message_telegram = prepare_message(indicators_result, last_result)
-        from start import send_telegram
-        send_telegram(text_for_message_telegram)
+        # text_for_message_telegram = prepare_message(indicators_result, last_result)
+        # from start import send_telegram
+        # send_telegram(text_for_message_telegram)
         print(result)
         print(result_pattern)
         markup_result['wma 4'] = result_wma_to_markup(result)

@@ -110,7 +110,7 @@ def run_job_stock():
 def run_job_currency():
     if working_period():
         list_for_update = list(currency.keys())
-        list_for_update.append(goods.keys())
+        list_for_update.extend(goods.keys())
         execute(list_for_update)
 
 
@@ -139,6 +139,7 @@ def start_upload_database():
     logging.info("start download quotes to database")
     create_dir("currency")
     create_dir("stock")
+    create_dir("goods")
     start_database()
     # change to false for debug and true for working
     if True:
@@ -175,6 +176,7 @@ if __name__ == "__main__":
 
     scheduler.add_job(clear_global_result, 'cron', hour=00, minute=19)
     scheduler.add_job(united_jobs, 'cron', hour=00, minute=20)
+
 
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())

@@ -56,9 +56,13 @@ def result_in_wma(data, list_of_wma):
     fast_period = list_of_wma[0]
     middle_period = list_of_wma[1]
     slow_period = list_of_wma[2]
-    fast = talib.WMA(data['close'].values, timeperiod=fast_period)
-    middle = talib.WMA(data['close'].values, timeperiod=middle_period)
-    slow = talib.WMA(data['close'].values, timeperiod=slow_period)
+    try:
+        fast = talib.WMA(data['close'].values, timeperiod=fast_period)
+        middle = talib.WMA(data['close'].values, timeperiod=middle_period)
+        slow = talib.WMA(data['close'].values, timeperiod=slow_period)
+    except:
+        logging.info("could not get wma")
+        return 'undefined'
 
     time_diff = data.index[-1] - data.index[-2]
 
