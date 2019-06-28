@@ -52,7 +52,7 @@ def execute(list_for_update):
     make_request(list_for_update, today_only=True)
     result_of_analyse = make_analyse(list_for_update)
     indicators_result = result_of_analyse.get('indicators')
-    wma_result = indicators_result.get('wma 4 result')
+    wma_result = indicators_result.get('wma result')
     if list_for_update[0] in currency or list_for_update[0] in goods:
         last_result = update_last_result("currency", wma_result)
         text_for_message_telegram = prepare_message(indicators_result, last_result)
@@ -142,7 +142,7 @@ def start_upload_database():
     create_dir("goods")
     start_database()
     # change to false for debug and true for working
-    if True:
+    if False:
         list_for_update = list(all_instruments.keys())
         make_request(list_for_update, today_only=False)
         logging.info("database was uploaded")
@@ -172,10 +172,10 @@ if __name__ == "__main__":
     scheduler.add_job(united_jobs, 'cron', hour=16, minute=33)
 
     scheduler.add_job(clear_global_result, 'cron', hour=20, minute=19)
-    scheduler.add_job(united_jobs, 'cron', hour=20, minute=20)
+    scheduler.add_job(run_job_currency, 'cron', hour=20, minute=20)
 
     scheduler.add_job(clear_global_result, 'cron', hour=00, minute=19)
-    scheduler.add_job(united_jobs, 'cron', hour=00, minute=20)
+    scheduler.add_job(run_job_currency, 'cron', hour=00, minute=20)
 
 
     scheduler.start()

@@ -6,14 +6,14 @@ import logging
 import pytz
 from indicators_analyse import indicators_make_analyse
 from database import select_from_database
-import const
+from const import *
 
 logging.basicConfig(level=logging.INFO)
 
 
 def get_dataframe_of_instrument(instrument):
 
-    data_hour = select_from_database(const.all_instruments.get(instrument))
+    data_hour = select_from_database(all_instruments.get(instrument))
 
     data_day = pd.DataFrame()
     data_day["code"] = data_hour.code.resample('D').first().dropna(how='any')
@@ -31,16 +31,17 @@ def get_dataframe_of_instrument(instrument):
     data_week["close"] = data_hour.close.resample('W').last().dropna(how='any')
     data_week["vol"] = data_hour.vol.resample('W').sum().dropna(how='any')
 
-    data_4_hours = pd.DataFrame()
-    data_4_hours["code"] = data_hour.code.resample('4H').first().dropna(how='any')
-    data_4_hours["open"] = data_hour.open.resample('4H').first().dropna(how='any')
-    data_4_hours["high"] = data_hour.high.resample('4H').max().dropna(how='any')
-    data_4_hours["low"] = data_hour.low.resample('4H').min().dropna(how='any')
-    data_4_hours["close"] = data_hour.close.resample('4H').last().dropna(how='any')
-    data_4_hours["vol"] = data_hour.vol.resample('4H').sum().dropna(how='any')
-
-    # return [data_4_hours, data_day, data_week]
-    return {'4 hours': data_4_hours, 'day': data_day, 'week': data_week}
+    if instrument in currency:
+        data_4_hours = pd.DataFrame()
+        data_4_hours["code"] = data_hour.code.resample('4H').first().dropna(how='any')
+        data_4_hours["open"] = data_hour.open.resample('4H').first().dropna(how='any')
+        data_4_hours["high"] = data_hour.high.resample('4H').max().dropna(how='any')
+        data_4_hours["low"] = data_hour.low.resample('4H').min().dropna(how='any')
+        data_4_hours["close"] = data_hour.close.resample('4H').last().dropna(how='any')
+        data_4_hours["vol"] = data_hour.vol.resample('4H').sum().dropna(how='any')
+        return {'4 hours': data_4_hours, 'day': data_day, 'week': data_week}
+    else:
+        return {'day': data_day, 'week': data_week}
 
 
 def make_analyse(instruments_for_analyse):
