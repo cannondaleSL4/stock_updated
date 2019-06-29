@@ -9,10 +9,13 @@ def result_wma_to_markup(wma_result, indicator_name="WMA"):
         result += "<table class=\"table table-inverse\"> <thread>" + \
                   "<tr><th scope=\"col\">Take a look for instrument(s)</th><th scope=\"col\">{}</th></tr></thread>".format(indicator_name)
         for res in sorted(wma_result.keys()):
-            if wma_result.get(res).get('4 hours'):
-                result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('4 hours') + "</td></tr>"
-            elif wma_result.get(res).get('day'):
-                result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('day') + "</td></tr>"
+            if isinstance(wma_result.get(res), dict):
+                if wma_result.get(res).get('4 hours'):
+                    result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('4 hours') + "</td></tr>"
+                elif wma_result.get(res).get('day'):
+                    result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('day') + "</td></tr>"
+            else:
+                result += "<tr><td>" + res + "</td><td>" + wma_result.get(res) + "</td></tr>"
         result += "</table>"
     return Markup(result)
 

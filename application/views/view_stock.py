@@ -69,6 +69,7 @@ def stock_post():
         indicators_result = result_of_analyse.get('indicators')
         result_wma = indicators_result.get('wma result')
         result_rsi = indicators_result.get('divergence result')
+        result_williams = indicators_result.get('williams')
         last_result = update_last_result("stock", result_wma)
         # text_for_message_telegram = prepare_message(indicators_result, last_result)
         # from start import send_telegram
@@ -78,8 +79,12 @@ def stock_post():
             markup_result['wma 4'] = result_wma_to_markup(result_wma)
 
         if result_rsi:
-            logging.log(result_rsi)
-            markup_result['rsi'] = result_wma_to_markup(result_rsi)
+            logging.info(result_rsi)
+            markup_result['rsi'] = result_wma_to_markup(result_rsi, "RSI")
+
+        if result_williams:
+            logging.info(result_williams)
+            markup_result['williams'] = result_wma_to_markup(result_williams, "WILLIAMS")
 
         if not result_wma and not result_rsi:
             flash("has no any results")

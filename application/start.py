@@ -142,7 +142,7 @@ def start_upload_database():
     create_dir("goods")
     start_database()
     # change to false for debug and true for working
-    if False:
+    if True:
         list_for_update = list(all_instruments.keys())
         make_request(list_for_update, today_only=False)
         logging.info("database was uploaded")

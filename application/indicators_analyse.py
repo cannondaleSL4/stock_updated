@@ -18,63 +18,10 @@ def indicators_make_analyse(dict_of_dataframes):
         dict_of_stock_results = get_result_stock(dict_of_dataframes)
         results['wma result'] = dict_of_stock_results.get('wma')
         results['rsi result'] = dict_of_stock_results.get('rsi')
+        results['williams'] = dict_of_stock_results.get('williams')
+
 
     return results
-
-
-def get_result_stock(dict_of_dataframes):
-    wma_result = dict()
-    rsi_result = dict()
-    local_result = dict()
-    for instrument in dict_of_dataframes:
-        if not parameters_wma.get(instrument):
-            logging.info("for instrument {} will be used default parameters 10,20,50".format(instrument))
-            result = for_two_time_frames(dict_of_dataframes.get(instrument), default_dict_wma)
-        else:
-            result = for_two_time_frames(dict_of_dataframes.get(instrument), parameters_wma.get(instrument))
-
-        if result != 'undefined':
-            wma_result[instrument] = result
-            local_result['wma'] = wma_result
-
-        result = 'undefined'
-        result = get_rsi_result(dict_of_dataframes.get(instrument))
-
-        if result != 'undefined':
-            rsi_result[instrument] = result.replace("/", "", 1)
-            local_result['rsi'] = rsi_result
-
-    return local_result
-
-
-def get_rsi_divergence(dict_of_dataframes):
-    result = ""
-    time_periods = ('4 hours', 'day', 'week')
-    for period in time_periods:
-        if period in dict_of_dataframes:
-            dataframe = dict_of_dataframes.get(period)
-            rsi = talib.RSI(dataframe['close'].values, timeperiod=14)
-            if ((sum(dataframe['close'].values[-30:])/30) > dataframe['close'].values[-1]) and (sum(rsi[-30:])/30 < rsi[-1]):
-                result = result + "/" + period + " : " + 'buy'
-            if ((sum(dataframe['close'].values[-30:]) / 30) < dataframe['close'].values[-1]) and (sum(rsi[-30:])/30 > rsi[-1]):
-                result = result + "/" + period + " : " + 'sell'
-
-    if not result:
-        return 'undefined'
-    return result
-
-
-def get_rsi_result(dict_of_dataframes):
-    result = ""
-    time_periods = ('4 hours', 'day', 'week')
-    for period in time_periods:
-        if period in dict_of_dataframes:
-            temp_result_rsi = result_rsi(dict_of_dataframes.get(period))
-            if temp_result_rsi != 'undefined':
-                result = result + "/" + period + " : " + temp_result_rsi
-    if not result:
-        return 'undefined'
-    return result
 
 
 def get_result_currency(dict_of_dataframes):
@@ -90,6 +37,55 @@ def get_result_currency(dict_of_dataframes):
             wma_result[instrument] = result
 
     return wma_result
+
+
+def get_result_stock(dict_of_dataframes):
+    wma_result = dict()
+    rsi_result = dict()
+    williams_result = dict()
+    local_result = dict()
+    for instrument in dict_of_dataframes:
+        if not parameters_wma.get(instrument):
+            logging.info("for instrument {} will be used default parameters 10,20,50".format(instrument))
+            result = for_two_time_frames(dict_of_dataframes.get(instrument), default_dict_wma)
+        else:
+            result = for_two_time_frames(dict_of_dataframes.get(instrument), parameters_wma.get(instrument))
+
+        if result != 'undefined':
+            wma_result[instrument] = result
+            local_result['wma'] = wma_result
+
+        result = 'undefined'
+        result = get_indicators_result(dict_of_dataframes.get(instrument), "rsi")
+
+        if result != 'undefined':
+            rsi_result[instrument] = result.replace("/", "", 1)
+            local_result['rsi'] = rsi_result
+
+        result = 'undefined'
+        result = get_indicators_result(dict_of_dataframes.get(instrument), "williams")
+
+        if result != 'undefined':
+            williams_result[instrument] = result.replace("/", "", 1)
+            local_result['williams'] = williams_result
+
+    return local_result
+
+
+def get_indicators_result(dict_of_dataframes, indicator):
+    result = ""
+    time_periods = ('4 hours', 'day', 'week')
+    for period in time_periods:
+        if period in dict_of_dataframes:
+            if indicator == "rsi":
+                temp_result = result_rsi(dict_of_dataframes.get(period))
+            elif indicator == "williams":
+                temp_result = result_willams(dict_of_dataframes.get(period))
+            if temp_result != 'undefined':
+                result = result + "/" + period + " : " + temp_result
+    if not result:
+        return 'undefined'
+    return result
 
 
 def for_two_time_frames(dict_of_dataframes, dict_of_wma):
@@ -165,26 +161,15 @@ def result_in_wma(data, list_of_wma):
 
 def adx_filter(data, operation):
     adx = talib.ADX(data.high.values, data.low.values, data.close.values, timeperiod=14)
+    minus = talib.MINUS_DI(data.high.values, data.low.values, data.close.values, timeperiod=14)
+    plus = talib.PLUS_DI(data.high.values, data.low.values, data.close.values, timeperiod=14)
+
     if adx[-1] > adx[-2]:
-        return operation
+        if operation == 'buy' and plus[-1] > minus[-1]:
+            return operation
+        if operation == 'sell' and plus[-1] < minus[-1]:
+            return operation
     return 'undefined'
-
-
-def macd_result(data):
-    macd = talib.MACD(data['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
-    result = 'undefined'
-    first_before = macd[0][-4]
-    second_before = macd[0][-2]
-    max_min = macd[0][-3]
-    first_after = macd[0][-2]
-    second_after = macd[0][-1]
-    if ((first_before > second_before) and (second_before > max_min) and (max_min < first_after) and (
-            first_after < second_after)):
-        result = 'buy'
-    if ((first_before < second_before) and (second_before < max_min) and (max_min > first_after) and (
-                first_after > second_after)):
-        result = 'sell'
-    return result
 
 
 def result_rsi(data):
@@ -201,27 +186,15 @@ def result_rsi(data):
     return 'undefined'
 
 
-
-def result_mfi(data):
-    mfi = talib.MFI(data['High'].values, data['Low'].values, data['Close'].values,
-                    np.array(list(map(float, data['Vol']))), timeperiod=14)
-    # return around numpy
-    if (mfi[-2] >= 80) and (mfi[-1] <= 80):
-        return 'turn to short ' + '%.2f' % np.float32(mfi[-1])
-    elif (mfi[-2] <= 20) and (mfi[-1] >= 20):
-        return 'turn to long ' + '%.2f' % np.float32(mfi[-1])
-    return 'undefined'
-
-
-def result_stochastic(data):
-    slowk, slowd = talib.STOCH(data['High'].values, data['Low'].values, data['Close'].values, fastk_period=10,
-                               slowk_period=6, slowd_period=6)
-    if (slowd[-2] >= 80 and slowk[-2] >= 80) and (slowk[-1] < 80):
-        return "sell"
-
-    if (slowd[-2] <= 20 and slowk[-2] <= 80) and (slowk[-1] > 20):
-        return "buy"
-
+def result_willams(data):
+    try:
+        willams = talib.WILLR(data.high.values, data.low.values, data.close.values, timeperiod=14)
+        if willams[-2] > -20 > willams[-1]:
+            return "turn to short"
+        if willams[-2] < -80 < willams[-1]:
+            return "turn to long"
+    except:
+        logging.info("could not get williams values")
     return 'undefined'
 
 
@@ -238,108 +211,3 @@ def get_period(data):
             time_diff) == '0 days 20:00:00':
         period = "4 hours"
     return period
-
-
-def result_bbands(data):
-    upperband, middleband, lowerband = talib.BBANDS(np.array(data['Close']),
-                                                    timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
-    last = data['Close'].values[-1]
-    pre_last = data['Close'].values[-2]
-    if (pre_last > upperband[-2]) and (last < upperband[-1]):
-        return 'turn to short'
-    if (pre_last < lowerband[-2]) and (last > lowerband[-1]):
-        return 'turn to long'
-    return 'undefined'
-
-
-def merge_bbands_stochastic(data):
-
-    upperband, middleband, lowerband = talib.BBANDS(np.array(data['Close']),
-                                               timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
-    bbands_result = 'undefined'
-    for i in range(-10, 0):
-        last = data['Close'].values[i]
-        pre_last = data['Close'].values[i-1]
-        if (pre_last > upperband[i-1]) and (last < upperband[i]):
-            bbands_result = 'turn to short'
-        if (pre_last < lowerband[i-1]) and (last > lowerband[i]):
-            bbands_result = 'turn to long'
-
-    if bbands_result != 'undefined':
-        return result_stochastic(data)
-    return 'undefined'
-
-
-def model(dataframes):
-    dict_of_result = dict()
-    for time_period in dataframes:
-        # поглощение
-        dataframe = dataframes.get(time_period)
-
-        try:
-            three_white_solders = talib.CDL3WHITESOLDIERS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        except:
-            logging.info("could not execute analyse for three white solders")
-
-        if three_white_solders.T[-1] != 0:
-            dict_of_result[str(time_period) + " three white solders"] = "buy"
-
-        #it's up
-        try:
-            morning_star = talib.CDLMORNINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        except:
-            logging.info("could not execute analyse for morning star")
-
-        if morning_star.T[-1] != 0:
-            dict_of_result[str(time_period) + " morning star"] = "buy"
-
-        #it's up
-        try:
-            three_star_south = talib.CDL3STARSINSOUTH(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        except:
-            logging.info("could not execute analyse for three star south")
-
-
-        if three_star_south.T[-1] != 0:
-            dict_of_result[str(time_period) + " three star south"] = "buy"
-
-
-        #it's down
-        try:
-            shooting_star = talib.CDLSHOOTINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        except:
-            logging.info("could not execute analyse for three shooting star")
-
-
-        if shooting_star.T[-1] != 0:
-            dict_of_result[str(time_period) + " shooting star"] = "sell"
-
-        #it's down
-        try:
-            evening_star = talib.CDLEVENINGSTAR(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        except:
-            logging.info("could not execute analyse for three evening star")
-
-        if evening_star.T[-1] != 0:
-            dict_of_result[str(time_period) + " evening star"] = "sell"
-
-        #lt's down
-        try:
-            three_black_crows = talib.CDL3BLACKCROWS(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-        except:
-            logging.info("could not execute analyse for three three black crows")
-
-        if three_black_crows.T[-1] != 0:
-            dict_of_result[str(time_period) + " three black crows"] = "sell"
-
-        # #it's down
-        # handing_man = talib.CDLHANGINGMAN(dataframe.open, dataframe.high, dataframe.low, dataframe.close)
-
-        # if handing_man.T[-1] != 0:
-        #     dict_of_result[str(time_period) + " handing man"] = "sell"
-
-    if not bool(dict_of_result):
-        return 'undefined'
-
-    return dict_of_result
-
