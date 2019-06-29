@@ -17,7 +17,7 @@ def indicators_make_analyse(dict_of_dataframes):
     else:
         dict_of_stock_results = get_result_stock(dict_of_dataframes)
         results['wma result'] = dict_of_stock_results.get('wma')
-        results['rsi results'] = dict_of_stock_results.get('rsi')
+        results['rsi result'] = dict_of_stock_results.get('rsi')
 
     return results
 
@@ -45,6 +45,23 @@ def get_result_stock(dict_of_dataframes):
             local_result['rsi'] = rsi_result
 
     return local_result
+
+
+def get_rsi_divergence(dict_of_dataframes):
+    result = ""
+    time_periods = ('4 hours', 'day', 'week')
+    for period in time_periods:
+        if period in dict_of_dataframes:
+            dataframe = dict_of_dataframes.get(period)
+            rsi = talib.RSI(dataframe['close'].values, timeperiod=14)
+            if ((sum(dataframe['close'].values[-30:])/30) > dataframe['close'].values[-1]) and (sum(rsi[-30:])/30 < rsi[-1]):
+                result = result + "/" + period + " : " + 'buy'
+            if ((sum(dataframe['close'].values[-30:]) / 30) < dataframe['close'].values[-1]) and (sum(rsi[-30:])/30 > rsi[-1]):
+                result = result + "/" + period + " : " + 'sell'
+
+    if not result:
+        return 'undefined'
+    return result
 
 
 def get_rsi_result(dict_of_dataframes):
@@ -83,9 +100,15 @@ def for_two_time_frames(dict_of_dataframes, dict_of_wma):
             return 'undefined'
 
     if ("sell" in temp_result['week']) and ("sell" in temp_result['day']):
+        adx = adx_filter(dict_of_dataframes.get('week'), 'sell')
+        if adx != 'sell':
+            return 'undefined'
         return temp_result
 
     if ("buy" in temp_result['week']) and ("buy" in temp_result['day']):
+        adx = adx_filter(dict_of_dataframes.get('week'), 'buy')
+        if adx != 'buy':
+            return 'undefined'
         return temp_result
 
     return 'undefined'
@@ -99,9 +122,15 @@ def for_three_timeframe(dict_of_dataframes, dict_of_wma):
             return 'undefined'
 
     if ("sell" in temp_result['week']) and ("sell" in temp_result['day']) and ("sell" in temp_result['4 hours']):
+        adx = adx_filter(dict_of_dataframes.get('day'), 'sell')
+        if adx != 'sell':
+            return 'undefined'
         return temp_result
 
     if ("buy" in temp_result['week']) and ("buy" in temp_result['day']) and ("buy" in temp_result['4 hours']):
+        adx = adx_filter(dict_of_dataframes.get('day'), 'buy')
+        if adx != 'buy':
+            return 'undefined'
         return temp_result
 
     return 'undefined'
@@ -124,13 +153,20 @@ def result_in_wma(data, list_of_wma):
     if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]) and (data.close[-1] > fast[-1]):
         for i in range(1, 100):
             if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i]) and (data.close[-1] > fast[-1])):
-                return 'buy during:{} periods of({})'.format(i, period)
+                    return 'buy during:{} periods of({})'.format(i, period)
 
     if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]) and (data.close[-1] < fast[-1]):
         for i in range(1, 100):
             if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i]) and (data.close[-1] < fast[-1])):
                 return 'sell during:{} periods of({})'.format(i, period)
 
+    return 'undefined'
+
+
+def adx_filter(data, operation):
+    adx = talib.ADX(data.high.values, data.low.values, data.close.values, timeperiod=14)
+    if adx[-1] > adx[-2]:
+        return operation
     return 'undefined'
 
 

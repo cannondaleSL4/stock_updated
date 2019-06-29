@@ -1,3 +1,4 @@
+import logging
 import os
 import const
 
@@ -74,19 +75,19 @@ def currency_post():
     if request.form['form'] == 'Analyse':
         result_of_analyse = make_analyse(list_for_update)
         indicators_result = result_of_analyse.get('indicators')
-        result = indicators_result.get('wma result')
-        result_pattern = indicators_result.get('pattern')
-        last_result = update_last_result("currency", result)
-        # text_for_message_telegram = prepare_message(indicators_result, last_result)
-        # from start import send_telegram
-        # send_telegram(text_for_message_telegram)
-        print(result)
-        print(result_pattern)
-        markup_result['wma 4'] = result_wma_to_markup(result)
+        result_wma = indicators_result.get('wma result')
+        if result_wma:
+            last_result = update_last_result("currency", result_wma)
+            logging.info(result_wma)
+            markup_result['wma 4'] = result_wma_to_markup(result_wma)
+            # text_for_message_telegram = prepare_message(indicators_result, last_result)
+            # from start import send_telegram
+            # send_telegram(text_for_message_telegram)
+        else:
+            flash("has no any results")
 
     if request.form['form'] == 'Optimize':
         get_best_params(list_for_update)
-
 
     return render_template('currency.html',
                            first_page="", second_page="/stock",
