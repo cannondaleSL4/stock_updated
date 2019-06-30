@@ -57,6 +57,13 @@ def select_from_database(instrument_code):
     return df
 
 
+def select_from_database_last_record(instrument_code):
+    df = pd.read_sql_query(select_last_record.format(instrument_code), con, index_col='date', parse_dates=['date'])
+    df.index = pd.to_datetime(df.index, unit='s')
+    df.drop('id', axis=1, inplace=True)
+    return df
+
+
 # working with global variable
 def upload_database_status():
     const.database_uploaded = True

@@ -81,13 +81,13 @@ def remove_current_period(data):
 
 # working with global variable
 def clear_lists_of_results():
-    const.result_currency.clear()
-    const.result_stocks.clear()
+    result_currency.clear()
+    result_stocks.clear()
 
 
 def set_currensy_result(list_of_result):
-    const.result_currency = list_of_result
+    result_currency = list_of_result
 
 
 def set_stocks_result(list_of_result):
-    const.result_stocks = list_of_result
+    result_stocks = list_of_result
