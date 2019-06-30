@@ -68,7 +68,7 @@ def stock_post():
         result_of_analyse = make_analyse(list_for_update)
         indicators_result = result_of_analyse.get('indicators')
         result_wma = indicators_result.get('wma result')
-        result_rsi = indicators_result.get('divergence result')
+        result_rsi = indicators_result.get('rsi result')
         result_williams = indicators_result.get('williams')
         last_result = update_last_result("stock", result_wma)
         # text_for_message_telegram = prepare_message(indicators_result, last_result)

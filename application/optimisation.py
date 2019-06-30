@@ -51,15 +51,16 @@ def get_list_of_willams_deals(test_dateframe):
                      :test_dateframe.index.searchsorted(datetime.fromtimestamp(index.timestamp())) + 1]
         willams = talib.WILLR(temp_slice.high.values, temp_slice.low.values, temp_slice.close.values, timeperiod=14)
 
-        if willams[-2] > -20 > willams[-1]:
-            # "turn to short"
-            if start_index == "":
-                start_index = index
-                buy_or_sell = "sell"
+        # if willams[-2] > -20 > willams[-1]:
+        #     # "turn to short"
+        #     if start_index == "":
+        #         start_index = index
+        #         buy_or_sell = "sell"
 
         if willams[-2] < -80 < willams[-1]:
             # "turn to long"
-            if start_index == "":
+            adx = talib.ADX(temp_slice.high.values, temp_slice.low.values, temp_slice.close.values, timeperiod=14)
+            if start_index == "" and adx[-2] > adx[-1]:
                 start_index = index
                 buy_or_sell = "buy"
 
