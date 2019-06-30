@@ -1,5 +1,8 @@
+import base64
 import datetime
 import os
+import subprocess
+import tempfile
 import urllib
 
 import math
@@ -8,6 +11,7 @@ import time
 import glob
 
 import pytz
+import requests
 from const import *
 
 import logging
@@ -47,15 +51,7 @@ def execute_request(instrument, market_code, instrument_dir, today_only):
                                                        datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     path_to_dir = UPLOAD_FOLDER + "/" + instrument_dir
     file_instrument_name = instrument.replace(" ", "_").replace("&", "_").replace("/", "_") + "_"
-    if instrument in stock_instruments:
-        instrument_code = str(stock_instruments.get(instrument))
-    elif instrument in currency:
-        instrument_code = str(currency.get(instrument))
-    elif instrument in goods:
-        instrument_code = str(goods.get(instrument))
-    else:
-        logging.info("Some bad happens")
-        return
+    instrument_code = str(all_instruments.get(instrument))
 
     list_of_dates = get_list_of_dates(today_only)
     successfully_download = True
@@ -85,11 +81,11 @@ def execute_request(instrument, market_code, instrument_dir, today_only):
                 successfully_download = True
             except:
                 successfully_download = False
-                time.sleep(.9)
+                time.sleep(.7)
                 logging.info("Could not make request to url {}".format(str(url_request)))
             else:
                 break
-        time.sleep(.9)
+        time.sleep(.5)
     logging.info("{} Was downloaded and now begin to parse files. time: {}".format(str(instrument),
                                                        datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime(
                                                            '%Y-%m-%d %H:%M:%S')))

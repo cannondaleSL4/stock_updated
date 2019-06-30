@@ -145,6 +145,8 @@ def result_in_wma(data, list_of_wma):
         return 'undefined'
 
     period = get_period(data)
+    if period == "undefined":
+        return 'undefined'
 
     if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]) and (data.close[-1] > fast[-1]):
         for i in range(1, 100):
@@ -181,7 +183,7 @@ def result_rsi(data):
         elif (rsi[-2] <= 30) and (rsi[-1] >= 30):
             return 'turn to long ' + '%.2f' % np.float32(rsi[-1])
     except:
-        logging.log("could not get RSI")
+        logging.info("could not get RSI")
 
     return 'undefined'
 
@@ -199,15 +201,19 @@ def result_willams(data):
 
 
 def get_period(data):
-    time_diff = data.index[-1] - data.index[-2]
-    period = "undefined"
-    if str(time_diff) == '1 days 00:00:00' or str(time_diff) == '2 days 00:00:00' or str(
-            time_diff) == '3 days 00:00:00':
-        period = "days"
-    elif str(time_diff) == '7 days 00:00:00':
-        period = "week"
-    elif str(time_diff) == '0 days 04:00:00' or str(time_diff) == '0 days 08:00:00' or str(
-            time_diff) == '0 days 12:00:00' or str(time_diff) == '0 days 16:00:00' or str(
-            time_diff) == '0 days 20:00:00':
-        period = "4 hours"
-    return period
+    try:
+        time_diff = data.index[-1] - data.index[-2]
+        period = "undefined"
+        if str(time_diff) == '1 days 00:00:00' or str(time_diff) == '2 days 00:00:00' or str(
+                time_diff) == '3 days 00:00:00':
+            period = "days"
+        elif str(time_diff) == '7 days 00:00:00':
+            period = "week"
+        elif str(time_diff) == '0 days 04:00:00' or str(time_diff) == '0 days 08:00:00' or str(
+                time_diff) == '0 days 12:00:00' or str(time_diff) == '0 days 16:00:00' or str(
+                time_diff) == '0 days 20:00:00':
+            period = "4 hours"
+        return period
+    except:
+        logging.info("could not get period")
+        return "undefined"
