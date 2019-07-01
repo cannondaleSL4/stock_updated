@@ -95,19 +95,19 @@ def for_two_time_frames(dict_of_dataframes, dict_of_wma):
         if temp_result[frame_period] == 'undefined':
             return 'undefined'
 
-    if ("sell" in temp_result['week']) and ("sell" in temp_result['day']):
-        adx = adx_filter(dict_of_dataframes.get('week'), 'sell')
-        if adx != 'sell':
-            return 'undefined'
-        return temp_result
+    # if ("sell" in temp_result['week']) and ("sell" in temp_result['day']):
+    #     adx = adx_filter(dict_of_dataframes.get('week'), 'sell')
+    #     if adx != 'sell':
+    #         return 'undefined'
+    #     return temp_result
+    #
+    # if ("buy" in temp_result['week']) and ("buy" in temp_result['day']):
+    #     adx = adx_filter(dict_of_dataframes.get('week'), 'buy')
+    #     if adx != 'buy':
+    #         return 'undefined'
+    #     return temp_result
 
-    if ("buy" in temp_result['week']) and ("buy" in temp_result['day']):
-        adx = adx_filter(dict_of_dataframes.get('week'), 'buy')
-        if adx != 'buy':
-            return 'undefined'
-        return temp_result
-
-    return 'undefined'
+    return temp_result
 
 
 def for_three_timeframe(dict_of_dataframes, dict_of_wma):

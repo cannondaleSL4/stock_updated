@@ -70,7 +70,7 @@ def stock_post():
         result_wma = indicators_result.get('wma result')
         result_rsi = indicators_result.get('rsi result')
         result_williams = indicators_result.get('williams')
-        last_result = update_last_result("stock", result_wma)
+        # last_result = update_last_result("stock", result_wma)
         # text_for_message_telegram = prepare_message(indicators_result, last_result)
         # from start import send_telegram
         # send_telegram(text_for_message_telegram)

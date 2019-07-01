@@ -23,8 +23,6 @@ from const import *
 from database import *
 from prepare_markup import prepare_message, result_wma_to_markup
 
-from database import update_last_result
-
 port = int(os.environ.get('PORT', 8080))
 
 logging.basicConfig(level=logging.INFO)
@@ -54,11 +52,9 @@ def execute(list_for_update):
     indicators_result = result_of_analyse.get('indicators')
     wma_result = indicators_result.get('wma result')
     if list_for_update[0] in currency or list_for_update[0] in goods:
-        last_result = update_last_result("currency", wma_result)
         text_for_message_telegram = prepare_message(indicators_result, last_result)
         text_for_message_email = result_wma_to_markup(wma_result)
     else:
-        last_result = update_last_result("stocks", wma_result)
         text_for_message_telegram = prepare_message(indicators_result, last_result)
         text_for_message_email = result_wma_to_markup(wma_result)
     logging.info(text_for_message_telegram)
