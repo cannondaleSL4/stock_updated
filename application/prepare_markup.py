@@ -4,20 +4,44 @@ from flask import Markup
 
 
 def result_wma_to_markup(wma_result, indicator_name="WMA"):
+    buy_dict_wma = dict()
+    sell_dict_wma = dict()
+
     result = ""
     if len(wma_result) != 0:
         result += "<table class=\"table table-inverse\"> <thread>" + \
-                  "<tr><th scope=\"col\">Take a look for instrument(s)</th><th scope=\"col\">{}</th></tr></thread>".format(indicator_name)
-        for res in sorted(wma_result.keys()):
-            if isinstance(wma_result.get(res), dict):
-                if wma_result.get(res).get('4 hours'):
-                    result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('4 hours') + "</td></tr>"
-                elif wma_result.get(res).get('day'):
-                    result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('day') + "</td></tr>"
-            else:
+                  "<tr><th scope=\"col\">Take a look for instrument(s)</th><th scope=\"col\">{}</th></tr></thread>".format(
+                      indicator_name)
+        if indicator_name == "WMA":
+            for key in wma_result:
+                if 'buy' in wma_result.get(key).get('day'):
+                    buy_dict_wma[key] = wma_result.get(key)
+                else:
+                    sell_dict_wma[key] = wma_result.get(key)
+            for res in sorted(buy_dict_wma):
+                result += "<tr><td>" + res + "</td><td>" + buy_dict_wma.get(res).get('day') + "</td></tr>"
+            for res in sorted(sell_dict_wma):
+                result += "<tr><td>" + res + "</td><td>" + sell_dict_wma.get(res).get('day') + "</td></tr>"
+        else:
+            for res in sorted(wma_result.keys()):
                 result += "<tr><td>" + res + "</td><td>" + wma_result.get(res) + "</td></tr>"
         result += "</table>"
     return Markup(result)
+
+    # # result = ""
+    # if len(wma_result) != 0:
+    #     result += "<table class=\"table table-inverse\"> <thread>" + \
+    #               "<tr><th scope=\"col\">Take a look for instrument(s)</th><th scope=\"col\">{}</th></tr></thread>".format(indicator_name)
+    #     for res in sorted(wma_result.keys()):
+    #         if isinstance(wma_result.get(res), dict):
+    #             if wma_result.get(res).get('4 hours'):
+    #                 result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('4 hours') + "</td></tr>"
+    #             elif wma_result.get(res).get('day'):
+    #                 result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('day') + "</td></tr>"
+    #         else:
+    #             result += "<tr><td>" + res + "</td><td>" + wma_result.get(res) + "</td></tr>"
+    #     result += "</table>"
+    # return Markup(result)
 
 
 def prepare_message(indicators_result, old_result):

@@ -28,7 +28,7 @@ def get_result_currency(dict_of_dataframes):
     wma_result = dict()
     for instrument in dict_of_dataframes:
         if not parameters_wma.get(instrument):
-            logging.info("for instrument {} will be used default parameters 10,20,50".format(instrument))
+            # logging.info("for instrument {} will be used default parameters 10,20,50".format(instrument))
             result = for_three_timeframe(dict_of_dataframes.get(instrument), default_dict_wma)
         else:
             result = for_three_timeframe(dict_of_dataframes.get(instrument), parameters_wma.get(instrument))
@@ -46,7 +46,7 @@ def get_result_stock(dict_of_dataframes):
     local_result = dict()
     for instrument in dict_of_dataframes:
         if not parameters_wma.get(instrument):
-            logging.info("for instrument {} will be used default parameters 10,20,50".format(instrument))
+            # logging.info("for instrument {} will be used default parameters 10,20,50".format(instrument))
             result = for_two_time_frames(dict_of_dataframes.get(instrument), default_dict_wma)
         else:
             result = for_two_time_frames(dict_of_dataframes.get(instrument), parameters_wma.get(instrument))

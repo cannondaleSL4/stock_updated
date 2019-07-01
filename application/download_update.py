@@ -127,7 +127,7 @@ def get_list_of_dates(today_only=False):
         if os.environ.get('OPTIMISATION'):
             period_ago = 1500
         else:
-            period_ago = 1000
+            period_ago = 365
         data_begin = (datetime.datetime.now() - datetime.timedelta(days=period_ago)).strftime("%m.%d.%Y")
 
     period = int(math.ceil(period_ago/100))
