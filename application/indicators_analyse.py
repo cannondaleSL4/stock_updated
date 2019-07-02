@@ -95,17 +95,11 @@ def for_two_time_frames(dict_of_dataframes, dict_of_wma):
         if temp_result[frame_period] == 'undefined':
             return 'undefined'
 
-    # if ("sell" in temp_result['week']) and ("sell" in temp_result['day']):
-    #     adx = adx_filter(dict_of_dataframes.get('week'), 'sell')
-    #     if adx != 'sell':
-    #         return 'undefined'
-    #     return temp_result
-    #
-    # if ("buy" in temp_result['week']) and ("buy" in temp_result['day']):
-    #     adx = adx_filter(dict_of_dataframes.get('week'), 'buy')
-    #     if adx != 'buy':
-    #         return 'undefined'
-    #     return temp_result
+    if ("sell" in temp_result['week']) and ("sell" in temp_result['day']):
+        return temp_result
+
+    if ("buy" in temp_result['week']) and ("buy" in temp_result['day']):
+        return temp_result
 
     return temp_result
 
@@ -148,13 +142,15 @@ def result_in_wma(data, list_of_wma):
     if period == "undefined":
         return 'undefined'
 
-    if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]) and (data.close[-1] > fast[-1]):
+    # if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]) and (data.close[-1] > fast[-1]):
+    if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]):
         for i in range(1, 100):
             # if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i]) and (data.close[-1] > fast[-1])):
             if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i])):
                     return 'buy during:{} periods of({})'.format(i, period)
 
-    if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]) and (data.close[-1] < fast[-1]):
+    # if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]) and (data.close[-1] < fast[-1]):
+    if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]):
         for i in range(1, 100):
             # if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i]) and (data.close[-1] < fast[-1])):
             if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i])):

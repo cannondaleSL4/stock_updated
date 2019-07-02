@@ -1,6 +1,7 @@
 import datetime
 import pytz
 from flask import Markup
+import re
 
 
 def result_wma_to_markup(wma_result, indicator_name="WMA"):
@@ -18,10 +19,14 @@ def result_wma_to_markup(wma_result, indicator_name="WMA"):
                     buy_dict_wma[key] = wma_result.get(key)
                 else:
                     sell_dict_wma[key] = wma_result.get(key)
-            for res in sorted(buy_dict_wma):
-                result += "<tr><td>" + res + "</td><td>" + buy_dict_wma.get(res).get('day') + "</td></tr>"
-            for res in sorted(sell_dict_wma):
-                result += "<tr><td>" + res + "</td><td>" + sell_dict_wma.get(res).get('day') + "</td></tr>"
+
+            buy_list = sort_by_days(buy_dict_wma)
+            sell_list = sort_by_days(sell_dict_wma)
+
+            for res in buy_list:
+                result += "<tr><td>" + res.split("|")[0] + "</td><td>" + res.split("|")[1] + "</td></tr>"
+            for res in sell_list:
+                result += "<tr><td>" + res.split("|")[0] + "</td><td>" + res.split("|")[1] + "</td></tr>"
         else:
             for res in sorted(wma_result.keys()):
                 result += "<tr><td>" + res + "</td><td>" + wma_result.get(res) + "</td></tr>"
@@ -42,6 +47,16 @@ def result_wma_to_markup(wma_result, indicator_name="WMA"):
     #             result += "<tr><td>" + res + "</td><td>" + wma_result.get(res) + "</td></tr>"
     #     result += "</table>"
     # return Markup(result)
+
+
+def sort_by_days(dict_wma):
+    list_sorted = list()
+    for key in sorted(dict_wma):
+        result = key + " | " + dict_wma.get(key).get("day")
+        number = int(re.findall(r'\d+', dict_wma.get(key).get("day"))[0])
+        list_sorted.append(result)
+
+    return list_sorted
 
 
 def prepare_message(indicators_result, old_result):

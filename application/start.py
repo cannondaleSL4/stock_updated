@@ -178,9 +178,11 @@ if __name__ == "__main__":
     # scheduler.start()
     # atexit.register(lambda: scheduler.shutdown())
 
-    t_2 = Thread(target=run_job_stock())
+    # t_2 = Thread(target=run_job_stock())
     # t_2 = Thread(target=start_upload_database)
-    t_2.start()
+    # t_2.start()
+
+
     # send_email(mail_username, mail_password, mail_username, "App has been restarted")
     # send_telegram("application has been restarted: {}"
     #               .format(datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
