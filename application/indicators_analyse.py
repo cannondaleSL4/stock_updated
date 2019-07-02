@@ -150,12 +150,14 @@ def result_in_wma(data, list_of_wma):
 
     if (fast[-1] > middle[-1]) and (middle[-1] > slow[-1]) and (data.close[-1] > fast[-1]):
         for i in range(1, 100):
-            if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i]) and (data.close[-1] > fast[-1])):
+            # if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i]) and (data.close[-1] > fast[-1])):
+            if not ((fast[-i] > middle[-i]) and (middle[-i] > slow[-i])):
                     return 'buy during:{} periods of({})'.format(i, period)
 
     if (fast[-1] < middle[-1]) and (middle[-1] < slow[-1]) and (data.close[-1] < fast[-1]):
         for i in range(1, 100):
-            if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i]) and (data.close[-1] < fast[-1])):
+            # if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i]) and (data.close[-1] < fast[-1])):
+            if not ((fast[-i] < middle[-i]) and (middle[-i] < slow[-i])):
                 return 'sell during:{} periods of({})'.format(i, period)
 
     return 'undefined'
