@@ -48,18 +48,18 @@ def execute(list_for_update):
     logging.info("start automatic update job at the " +
                  datetime.now(pytz.timezone('Europe/Moscow')).strftime("%d.%m.%Y %Y-%m-%d %H:%M:%S"))
     make_request(list_for_update, today_only=True)
-    result_of_analyse = make_analyse(list_for_update)
-    indicators_result = result_of_analyse.get('indicators')
-    wma_result = indicators_result.get('wma result')
-    if list_for_update[0] in currency or list_for_update[0] in goods:
-        text_for_message_telegram = prepare_message(indicators_result, last_result)
-        text_for_message_email = result_wma_to_markup(wma_result)
-    else:
-        text_for_message_telegram = prepare_message(indicators_result, last_result)
-        text_for_message_email = result_wma_to_markup(wma_result)
-    logging.info(text_for_message_telegram)
-    send_email(mail_username, mail_password, mail_username, text_for_message_email)
-    send_telegram(text_for_message_telegram)
+    # result_of_analyse = make_analyse(list_for_update)
+    # indicators_result = result_of_analyse.get('indicators')
+    # wma_result = indicators_result.get('wma result')
+    # if list_for_update[0] in currency or list_for_update[0] in goods:
+    #     text_for_message_telegram = prepare_message(indicators_result, last_result)
+    #     text_for_message_email = result_wma_to_markup(wma_result)
+    # else:
+    #     text_for_message_telegram = prepare_message(indicators_result, last_result)
+    #     text_for_message_email = result_wma_to_markup(wma_result)
+    # logging.info(text_for_message_telegram)
+    # send_email(mail_username, mail_password, mail_username, text_for_message_email)
+    # send_telegram(text_for_message_telegram)
     logging.info("automatic job was executed at the " +
                  datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -138,7 +138,7 @@ def start_upload_database():
     create_dir("goods")
     start_database()
     # change to false for debug and true for working
-    if False:
+    if True:
         list_for_update = list(all_instruments.keys())
         list_for_update = sorted(list_for_update)
         make_request(list_for_update, today_only=False)
@@ -153,34 +153,35 @@ def clear_global_result():
 
 if __name__ == "__main__":
     init()
-    scheduler = BackgroundScheduler(timezone=pytz.timezone('Europe/Moscow'))
-    scheduler.add_job(ping_yandex, 'interval', minutes=25)
+    # scheduler = BackgroundScheduler(timezone=pytz.timezone('Europe/Moscow'))
+    # scheduler.add_job(ping_yandex, 'interval', minutes=25)
+    #
+    # scheduler.add_job(clear_global_result, 'cron', hour=4, minute=19)
+    # scheduler.add_job(run_job_currency, 'cron', hour=4, minute=20)
+    #
+    # scheduler.add_job(clear_global_result, 'cron', hour=8, minute=19)
+    # scheduler.add_job(run_job_currency, 'cron', hour=8, minute=20)
+    #
+    # scheduler.add_job(clear_global_result, 'cron', hour=12, minute=19)
+    # scheduler.add_job(run_job_currency, 'cron', hour=12, minute=20)
+    #
+    # scheduler.add_job(clear_global_result, 'cron', hour=16, minute=32)
+    # scheduler.add_job(united_jobs, 'cron', hour=16, minute=33)
+    #
+    # scheduler.add_job(clear_global_result, 'cron', hour=20, minute=19)
+    # scheduler.add_job(run_job_currency, 'cron', hour=20, minute=20)
+    #
+    # scheduler.add_job(clear_global_result, 'cron', hour=00, minute=19)
+    # scheduler.add_job(run_job_currency, 'cron', hour=00, minute=20)
+    #
+    #
+    # scheduler.start()
+    # atexit.register(lambda: scheduler.shutdown())
 
-    scheduler.add_job(clear_global_result, 'cron', hour=4, minute=19)
-    scheduler.add_job(run_job_currency, 'cron', hour=4, minute=20)
-
-    scheduler.add_job(clear_global_result, 'cron', hour=8, minute=19)
-    scheduler.add_job(run_job_currency, 'cron', hour=8, minute=20)
-
-    scheduler.add_job(clear_global_result, 'cron', hour=12, minute=19)
-    scheduler.add_job(run_job_currency, 'cron', hour=12, minute=20)
-
-    scheduler.add_job(clear_global_result, 'cron', hour=16, minute=32)
-    scheduler.add_job(united_jobs, 'cron', hour=16, minute=33)
-
-    scheduler.add_job(clear_global_result, 'cron', hour=20, minute=19)
-    scheduler.add_job(run_job_currency, 'cron', hour=20, minute=20)
-
-    scheduler.add_job(clear_global_result, 'cron', hour=00, minute=19)
-    scheduler.add_job(run_job_currency, 'cron', hour=00, minute=20)
-
-
-    scheduler.start()
-    atexit.register(lambda: scheduler.shutdown())
-
-    t_2 = Thread(target=start_upload_database)
+    t_2 = Thread(target=run_job_stock())
+    # t_2 = Thread(target=start_upload_database)
     t_2.start()
-    send_email(mail_username, mail_password, mail_username, "App has been restarted")
-    send_telegram("application has been restarted: {}"
-                  .format(datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
+    # send_email(mail_username, mail_password, mail_username, "App has been restarted")
+    # send_telegram("application has been restarted: {}"
+    #               .format(datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     app.run(host='0.0.0.0', port=port)
