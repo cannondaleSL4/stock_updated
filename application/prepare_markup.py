@@ -2,6 +2,7 @@ import datetime
 import pytz
 from flask import Markup
 import re
+from operator import itemgetter
 
 
 def result_wma_to_markup(wma_result, indicator_name="WMA"):
@@ -33,27 +34,19 @@ def result_wma_to_markup(wma_result, indicator_name="WMA"):
         result += "</table>"
     return Markup(result)
 
-    # # result = ""
-    # if len(wma_result) != 0:
-    #     result += "<table class=\"table table-inverse\"> <thread>" + \
-    #               "<tr><th scope=\"col\">Take a look for instrument(s)</th><th scope=\"col\">{}</th></tr></thread>".format(indicator_name)
-    #     for res in sorted(wma_result.keys()):
-    #         if isinstance(wma_result.get(res), dict):
-    #             if wma_result.get(res).get('4 hours'):
-    #                 result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('4 hours') + "</td></tr>"
-    #             elif wma_result.get(res).get('day'):
-    #                 result += "<tr><td>" + res + "</td><td>" + wma_result.get(res).get('day') + "</td></tr>"
-    #         else:
-    #             result += "<tr><td>" + res + "</td><td>" + wma_result.get(res) + "</td></tr>"
-    #     result += "</table>"
-    # return Markup(result)
-
 
 def sort_by_days(dict_wma):
     list_sorted = list()
+    temp_dict = dict()
+
     for key in sorted(dict_wma):
-        result = key + " | " + dict_wma.get(key).get("day")
         number = int(re.findall(r'\d+', dict_wma.get(key).get("day"))[0])
+        temp_dict[key] = number
+
+    sorted_dict = sorted(temp_dict.items(), key=itemgetter(1))
+
+    for key in sorted_dict:
+        result = key[0] + " | " + dict_wma.get(key[0]).get("day")
         list_sorted.append(result)
 
     return list_sorted
