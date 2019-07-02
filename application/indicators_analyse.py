@@ -20,7 +20,6 @@ def indicators_make_analyse(dict_of_dataframes):
         results['rsi result'] = dict_of_stock_results.get('rsi')
         results['williams'] = dict_of_stock_results.get('williams')
 
-
     return results
 
 
@@ -101,7 +100,7 @@ def for_two_time_frames(dict_of_dataframes, dict_of_wma):
     if ("buy" in temp_result['week']) and ("buy" in temp_result['day']):
         return temp_result
 
-    return temp_result
+    return 'undefined'
 
 
 def for_three_timeframe(dict_of_dataframes, dict_of_wma):
