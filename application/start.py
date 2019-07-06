@@ -14,14 +14,12 @@ import requests
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from apscheduler.schedulers.background import BackgroundScheduler
-from analyse import make_analyse, clear_lists_of_results, set_currensy_result, set_stocks_result
+from analyse import make_analyse
 from download_update import create_dir, make_request, clear_dir
-from prepare_markup import *
 from views.view_currency import view_currency
 from views.view_stock import view_stock
 from const import *
 from database import *
-from prepare_markup import prepare_message, result_wma_to_markup
 
 port = int(os.environ.get('PORT', 8080))
 
@@ -178,9 +176,9 @@ if __name__ == "__main__":
     # scheduler.start()
     # atexit.register(lambda: scheduler.shutdown())
 
-    t_2 = Thread(target=run_job_stock())
+    # t_2 = Thread(target=run_job_stock())
     # t_2 = Thread(target=start_upload_database)
-    t_2.start()
+    # t_2.start()
 
 
     # send_email(mail_username, mail_password, mail_username, "App has been restarted")

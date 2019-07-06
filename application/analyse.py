@@ -1,4 +1,3 @@
-import glob
 import pandas as pd
 import datetime
 import logging
@@ -8,7 +7,30 @@ from indicators_analyse import indicators_make_analyse
 from database import select_from_database
 from const import *
 
+from resultanalyse import ResultAnalyse
+
 logging.basicConfig(level=logging.INFO)
+
+
+def make_analyse(instruments_for_analyse):
+    unite_data = dict()
+    logging.info("Process of collection from database to dataframe of was started at {}".format(datetime.datetime.now(
+                                                                               pytz.timezone('Europe/Moscow')).strftime(
+                                                                               '%Y-%m-%d %H:%M:%S')))
+    for instrument in instruments_for_analyse:
+        try:
+            data = get_dataframe_of_instrument(instrument)
+            data = remove_current_period(data)
+            unite_data[str(instrument)] = data
+        except:
+            logging.info("could not read {}".format(instrument))
+
+    logging.info("Process of collection from database to dataframe of was ended at {}".format(datetime.datetime.now(
+                                                                               pytz.timezone('Europe/Moscow')).strftime(
+                                                                               '%Y-%m-%d %H:%M:%S')))
+    result = ResultAnalyse(indicators_make_analyse(unite_data))
+    json_result = result.to_json()
+    return result
 
 
 def get_dataframe_of_instrument(instrument):
@@ -44,27 +66,6 @@ def get_dataframe_of_instrument(instrument):
         return {'day': data_day, 'week': data_week}
 
 
-def make_analyse(instruments_for_analyse):
-    unite_data = dict()
-    results = dict()
-    logging.info("Process of collection from database to dataframe of was started at {}".format(datetime.datetime.now(
-                                                                               pytz.timezone('Europe/Moscow')).strftime(
-                                                                               '%Y-%m-%d %H:%M:%S')))
-    for instrument in instruments_for_analyse:
-        try:
-            data = get_dataframe_of_instrument(instrument)
-            data = remove_current_period(data)
-            unite_data[str(instrument)] = data
-        except:
-            logging.info("could not read {}".format(instrument))
-
-    logging.info("Process of collection from database to dataframe of was ended at {}".format(datetime.datetime.now(
-                                                                               pytz.timezone('Europe/Moscow')).strftime(
-                                                                               '%Y-%m-%d %H:%M:%S')))
-    results['indicators'] = indicators_make_analyse(unite_data)
-    return results
-
-
 def remove_current_period(data):
     # at weekend week and day data is closed and we can use, in workdays we should cut last day and week
     result = dict()
@@ -77,17 +78,3 @@ def remove_current_period(data):
         return result
     else:
         return data
-
-
-# working with global variable
-def clear_lists_of_results():
-    result_currency.clear()
-    result_stocks.clear()
-
-
-def set_currensy_result(list_of_result):
-    result_currency = list_of_result
-
-
-def set_stocks_result(list_of_result):
-    result_stocks = list_of_result

@@ -12,6 +12,8 @@ default_dict_wma = {"week": [10, 20, 50], "day": [10, 20, 50], "4 hours": [10, 2
 
 def indicators_make_analyse(dict_of_dataframes):
     results = dict()
+    if len(dict_of_dataframes) == 0:
+        return results
     if list(dict_of_dataframes.keys())[0] in currency:
         results['wma result'] = get_result_currency(dict_of_dataframes)
     else:

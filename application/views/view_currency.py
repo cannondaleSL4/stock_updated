@@ -4,15 +4,12 @@ import const
 
 from flask import Blueprint, Markup, render_template, request, flash
 
-from analyse import make_analyse, set_currensy_result
+from analyse import make_analyse
 from download_update import *
-from indicators_analyse import *
-from prepare_markup import *
 from const import *
 from optimisation import get_best_params
-from database import update_last_result
+from indicators_analyse import *
 
-from prepare_markup import prepare_message
 
 template_dir = os.path.abspath('templates')
 static_dir = os.path.abspath('static')
@@ -21,21 +18,18 @@ view_currency = Blueprint('view_currency', __name__, template_folder=template_di
                           static_url_path=static_dir)
 
 
-@view_currency.route("/")
+@view_currency.route("/currency")
 def currency_page():
-    # if not const.database_uploaded:
-    #     flash("Please waiting database still uploading")
 
     return render_template('currency.html',
-                           first_page="", second_page="/stock",
+                           first_page="", second_page="/",
                            active="nav-link active",
                            not_active="nav-link",
                            instruments=sorted(currency.keys()))
 
 
-@view_currency.route('/', methods=['POST'])
+@view_currency.route('/currency', methods=['POST'])
 def currency_post():
-    markup_result = dict()
     list_for_update = list(currency.keys())
     list_for_update.extend(list(goods.keys()))
     if request.form['form'] == 'Upload data':
@@ -72,25 +66,17 @@ def currency_post():
         result = "all data has been clear from {}/currency".format(UPLOAD_FOLDER)
         flash(result)
 
-    if request.form['form'] == 'Analyse':
-        result_of_analyse = make_analyse(list_for_update)
-        indicators_result = result_of_analyse.get('indicators')
-        result_wma = indicators_result.get('wma result')
-        if result_wma:
-            last_result = update_last_result("currency", result_wma)
-            logging.info(result_wma)
-            markup_result['wma 4'] = result_wma_to_markup(result_wma)
-            # text_for_message_telegram = prepare_message(indicators_result, last_result)
-            # from start import send_telegram
-            # send_telegram(text_for_message_telegram)
-        else:
-            flash("has no any results")
-
     if request.form['form'] == 'Optimize':
         get_best_params(list_for_update)
 
+    if request.form['form'] == 'Analyse':
+        result_of_analyse = make_analyse(list_for_update)
+
+        if not result_of_analyse:
+            flash("has no any results")
+
     return render_template('currency.html',
-                           first_page="", second_page="/stock",
+                           first_page="", second_page="/",
                            active="nav-link active",
                            not_active="nav-link",
-                           instruments=sorted(currency.keys()), markup_result=markup_result)
+                           instruments=sorted(currency.keys()), markup_result=result_of_analyse.result_for_html)
