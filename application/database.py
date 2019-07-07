@@ -17,15 +17,15 @@ create_quotes = """CREATE TABLE IF NOT EXISTS quotes
 create_index_code = "CREATE INDEX IF NOT EXISTS  index_quotes_code ON quotes(code)"
 create_index_instrument = "CREATE INDEX  IF NOT EXISTS index_quotes_instrument ON quotes(instrument)"
 
-create_table_last_result = "CREATE TABLE IF NOT EXISTS last_result(id integer primary key, instrument text, result text)"
-insert_last_result = "INSERT INTO last_result (instrument, result) values('{}','{}')"
-delete_last_result = "DELETE FROM last_result WHERE instrument = '{}'"
+create_table_last_result = "CREATE TABLE IF NOT EXISTS last_result(instrument text primary key, result json," \
+                           " date timestamp)"
 get_last_result = "SELECT * FROM last_result WHERE instrument = '{}'"
+insert_last_result = "INSERT INTO last_result (instrument, result, date) values(?,?,?)"
+select_last_record = "SELECT * FROM last_result WHERE instrument= '{}'"
 
 
 insert = "INSERT INTO quotes(instrument, code, date, open, high, low, close, vol) values(?, ?, ?, ?, ?, ?, ?, ?)"
 select_database_by_code = "SELECT * FROM quotes WHERE code= {}"
-select_last_record = "SELECT MAX(date) FROM quotes WHERE code= {}"
 
 
 def start_database():
@@ -57,28 +57,25 @@ def select_from_database(instrument_code):
     return df
 
 
-def select_from_database_last_record(instrument_code):
-    df = pd.read_sql_query(select_last_record.format(instrument_code), con, index_col='date', parse_dates=['date'])
-    df.index = pd.to_datetime(df.index, unit='s')
-    df.drop('id', axis=1, inplace=True)
-    return df
-
-
 # working with global variable
 def upload_database_status():
     const.database_uploaded = True
 
 
-def update_last_result(instrument, updated_result):
+def select_from_database_last_record(stock_currency):
     cur = con.cursor()
-    cur.execute(get_last_result.format(instrument))
-    result = cur.fetchone()
-    cur.execute(delete_last_result.format(instrument))
-    cur.execute(insert_last_result.format(instrument, json.dumps(updated_result)))
+    result = cur.execute(select_last_record.format(stock_currency))
+    rows = cur.fetchall()
+    if len(rows) == 0:
+        return False
+    return rows[0]
+
+
+def update_last_result(instrument, updated_result, date):
+    cur = con.cursor()
+    cur.execute(insert_last_result, (instrument, (json.dumps(updated_result)), date))
+    # cur.execute(insert_last_result.format(instrument, json.dumps(updated_result), date))
     con.commit()
-    if result != None:
-        return json.loads(result[2])
-    return result
 
 
 

@@ -136,7 +136,7 @@ def start_upload_database():
     create_dir("goods")
     start_database()
     # change to false for debug and true for working
-    if True:
+    if False:
         list_for_update = list(all_instruments.keys())
         list_for_update = sorted(list_for_update)
         make_request(list_for_update, today_only=False)
@@ -177,8 +177,8 @@ if __name__ == "__main__":
     # atexit.register(lambda: scheduler.shutdown())
 
     # t_2 = Thread(target=run_job_stock())
-    # t_2 = Thread(target=start_upload_database)
-    # t_2.start()
+    t_2 = Thread(target=start_upload_database)
+    t_2.start()
 
 
     # send_email(mail_username, mail_password, mail_username, "App has been restarted")

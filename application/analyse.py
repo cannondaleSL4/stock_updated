@@ -1,10 +1,12 @@
+import time
+import json
 import pandas as pd
 import datetime
 import logging
 
 import pytz
 from indicators_analyse import indicators_make_analyse
-from database import select_from_database
+from database import select_from_database, select_from_database_last_record, update_last_result
 from const import *
 
 from resultanalyse import ResultAnalyse
@@ -17,19 +19,33 @@ def make_analyse(instruments_for_analyse):
     logging.info("Process of collection from database to dataframe of was started at {}".format(datetime.datetime.now(
                                                                                pytz.timezone('Europe/Moscow')).strftime(
                                                                                '%Y-%m-%d %H:%M:%S')))
-    for instrument in instruments_for_analyse:
-        try:
-            data = get_dataframe_of_instrument(instrument)
-            data = remove_current_period(data)
-            unite_data[str(instrument)] = data
-        except:
-            logging.info("could not read {}".format(instrument))
 
-    logging.info("Process of collection from database to dataframe of was ended at {}".format(datetime.datetime.now(
-                                                                               pytz.timezone('Europe/Moscow')).strftime(
-                                                                               '%Y-%m-%d %H:%M:%S')))
-    result = ResultAnalyse(indicators_make_analyse(unite_data))
-    json_result = result.to_json()
+    if instruments_for_analyse[0] in currency:
+        request_instrument = "currency"
+    else:
+        request_instrument = "stock"
+
+    last_result = select_from_database_last_record(request_instrument)
+
+    if not last_result:
+
+        for instrument in instruments_for_analyse:
+            try:
+                data = get_dataframe_of_instrument(instrument)
+                data = remove_current_period(data)
+                unite_data[str(instrument)] = data
+            except:
+                logging.info("could not read {}".format(instrument))
+
+        logging.info("Process of collection from database to dataframe of was ended at {}".format(datetime.datetime.now(
+                                                                                   pytz.timezone('Europe/Moscow')).strftime(
+                                                                                       '%Y-%m-%d %H:%M:%S')))
+
+        result = ResultAnalyse(indicators_make_analyse(unite_data))
+        json_result = result.to_json()
+        update_last_result(request_instrument, json_result, time.time())
+    else:
+        result = json.loads(last_result[1])
     return result
 
 
