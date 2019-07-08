@@ -8,8 +8,7 @@ import pytz
 from indicators_analyse import indicators_make_analyse
 from database import select_from_database, select_from_database_last_record, update_last_result
 from const import *
-
-from resultanalyse import ResultAnalyse
+from resultanalyse import ResultAnalyse, CustomEncoder, convert_to_dict, dict_to_obj
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,10 +41,13 @@ def make_analyse(instruments_for_analyse):
                                                                                        '%Y-%m-%d %H:%M:%S')))
 
         result = ResultAnalyse(indicators_make_analyse(unite_data))
-        json_result = result.to_json()
-        update_last_result(request_instrument, json_result, time.time())
+        # json_result = result.to_json()
+        json_result = json.dumps(result,default=convert_to_dict,indent=4, sort_keys=True)
+        # json_result = json.dumps(result, indent=4, cls=CustomEncoder)
+        # update_last_result(request_instrument, json_result, time.time())
     else:
-        result = json.loads(last_result[1])
+        result = json.loads(last_result[1], object_hook=dict_to_obj)
+        # result = json.loads(last_result[1], cls=ResultAnalyse)
     return result
 
 

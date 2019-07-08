@@ -64,11 +64,12 @@ def upload_database_status():
 
 def select_from_database_last_record(stock_currency):
     cur = con.cursor()
-    result = cur.execute(select_last_record.format(stock_currency))
+    cur.execute(select_last_record.format(stock_currency))
     rows = cur.fetchall()
     if len(rows) == 0:
         return False
-    return rows[0]
+    # return rows[0]
+    return False
 
 
 def update_last_result(instrument, updated_result, date):
