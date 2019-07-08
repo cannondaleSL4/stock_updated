@@ -45,7 +45,7 @@ class ResultAnalyse:
             for instrument in current_deals:
                 if instrument not in buy_dict_wma:
                     result_html += "<tr class=\"table-warning\"><td>" + instrument + "</td><td>"
-                if instrument in sell_list:
+                if instrument in sell_dict_wma:
                     result_html += "<tr class=\"table-danger\"><td>" + instrument + "</td><td>"
             result_html += "</table></div>"
 
