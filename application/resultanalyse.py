@@ -43,10 +43,10 @@ class ResultAnalyse:
             result_html += "<div class=\"col\"><table class=\"table table-inverse\"> <thread>" + \
                            "<tr><th scope=\"col\">Take a look for instrument(s)</th>"
             for instrument in current_deals:
-                if instrument not in buy_dict_wma:
-                    result_html += "<tr class=\"table-warning\"><td>" + instrument + "</td><td>"
                 if instrument in sell_dict_wma:
                     result_html += "<tr class=\"table-danger\"><td>" + instrument + "</td><td>"
+                elif instrument not in buy_dict_wma:
+                    result_html += "<tr class=\"table-warning\"><td>" + instrument + "</td><td>"
             result_html += "</table></div>"
 
         if 'williams' in result:
