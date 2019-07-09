@@ -74,19 +74,19 @@ index_instruments = {
 
 current_deals = (
     'Adobe Systems Inc.',
-    'American States Water Company',
     'AMETEK, Inc.',
     'Cerner Corporation',
     'China Biologic Products Holdings, Inc.',
-    'Delta Air Lines, Inc.',
-    'Facebook, Inc.',
     'Fifth Third Bancorp',
     'Ford Motor Co',
     'Herman Miller, Inc.',
     'Installed Building Products, Inc.',
-    'M&T Bank Corporation',
+    'Kimberly-Clark Corporation',
     'NETGEAR, Inc.',
-    'NextEra Energy Inc'
+    'NextEra Energy Inc',
+    'PayPal Holdings, Inc.',
+    'Veeva Systems Inc.',
+    'WEC Energy Group, Inc.'
 )
 
 # market code - 25
