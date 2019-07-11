@@ -1,4 +1,3 @@
-import time
 import json
 import pandas as pd
 import datetime
@@ -86,13 +85,21 @@ def get_dataframe_of_instrument(instrument):
 
 def remove_current_period(data):
     # at weekend week and day data is closed and we can use, in workdays we should cut last day and week
-    result = dict()
+    # result = dict()
     week_no = datetime.datetime.today().weekday()
+    day_of_year_today = datetime.datetime.now().timetuple().tm_yday
     if week_no < 5:
         for each_data in data:
             temp_data = data.get(each_data)
-            temp_data = temp_data[:-1]
-            result[each_data] = temp_data
-        return result
+            if each_data != 'week':
+                if temp_data.index[-1].dayofyear == day_of_year_today:
+                    temp_data = temp_data[:-1]
+                    data[each_data] = temp_data
+                else:
+                    data[each_data] = temp_data
+            else:
+                temp_data = temp_data[:-1]
+                data[each_data] = temp_data
+        return data
     else:
         return data
