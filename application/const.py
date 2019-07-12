@@ -73,20 +73,19 @@ index_instruments = {
 }
 
 current_deals = (
-    'Adobe Systems Inc.',
     'AMETEK, Inc.',
-    'Cerner Corporation',
     'China Biologic Products Holdings, Inc.',
+    'CMS Energy Corporation',
+    'CoreLogic, Inc.',
     'Fifth Third Bancorp',
     'Ford Motor Co',
     'Herman Miller, Inc.',
+    'The Hershey Company',
     'Installed Building Products, Inc.',
     'Kimberly-Clark Corporation',
     'NETGEAR, Inc.',
-    'NextEra Energy Inc',
-    'PayPal Holdings, Inc.',
-    'Veeva Systems Inc.',
-    'WEC Energy Group, Inc.'
+    'WEC Energy Group, Inc.',
+    'Xcel Energy Inc.'
 )
 
 # market code - 25
