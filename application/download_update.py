@@ -47,8 +47,8 @@ def make_request(list_for_update, today_only=True):
 
 
 def execute_request(instrument, market_code, instrument_dir, today_only):
-    logging.info("Start to update {} at the {}".format(str(instrument),
-                                                       datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
+    # logging.info("Start to update {} at the {}".format(str(instrument),
+    #                                                    datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     path_to_dir = UPLOAD_FOLDER + "/" + instrument_dir
     file_instrument_name = instrument.replace(" ", "_").replace("&", "_").replace("/", "_") + "_"
     instrument_code = str(all_instruments.get(instrument))
@@ -86,9 +86,9 @@ def execute_request(instrument, market_code, instrument_dir, today_only):
             else:
                 break
         time.sleep(.5)
-    logging.info("{} Was downloaded and now begin to parse files. time: {}".format(str(instrument),
-                                                       datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime(
-                                                           '%Y-%m-%d %H:%M:%S')))
+    # logging.info("{} Was downloaded and now begin to parse files. time: {}".format(str(instrument),
+    #                                                    datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime(
+    #                                                        '%Y-%m-%d %H:%M:%S')))
     if not successfully_download:
         for temp_file in glob.glob(path_to_dir + "/*.csv"):
             if "_TEMP" in str(temp_file):

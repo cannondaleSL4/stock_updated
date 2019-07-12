@@ -97,13 +97,13 @@ def send_telegram(text):
 
 def run_job_stock():
     if working_period():
-        list_for_update = list(stock_instruments.keys())
+        list_for_update = sorted(stock_instruments.keys())
         execute(list_for_update)
 
 
 def run_job_currency():
     if working_period():
-        list_for_update = list(currency.keys())
+        list_for_update = sorted(currency.keys())
         list_for_update.extend(goods.keys())
         execute(list_for_update)
 
