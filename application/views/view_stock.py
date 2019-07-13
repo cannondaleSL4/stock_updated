@@ -25,6 +25,7 @@ def stock_page():
 @view_stock.route('/', methods=['POST'])
 def stock_post():
     list_for_update = list(stock_instruments.keys())
+    result_for_html = ""
     if request.form['form'] == 'Upload data':
         create_dir("stock")
         if len(request.form.getlist('instr')) == 0:
@@ -58,6 +59,7 @@ def stock_post():
 
     if request.form['form'] == 'Analyse':
         result_of_analyse = make_analyse(list_for_update)
+        result_for_html = result_of_analyse.result_for_html
 
         if not result_of_analyse:
             flash("has no any results")
@@ -66,4 +68,4 @@ def stock_post():
                            first_page="/currency", second_page="/",
                            active="nav-link",
                            not_active="nav-link active",
-                           instruments=sorted(stock_instruments.keys()), markup_result=result_of_analyse.result_for_html)
+                           instruments=sorted(stock_instruments.keys()), markup_result=result_for_html)
