@@ -1,6 +1,6 @@
 *.db
 quotes.db
-./application/quotes.db
+./application/database/quotes.db
 db/*.sqlite3
 .git
 .cache
