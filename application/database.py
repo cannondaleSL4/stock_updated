@@ -6,7 +6,7 @@ import logging
 import const
 import pandas as pd
 
-con = sqlite3.connect("./quotes.db", check_same_thread=False)
+con = sqlite3.connect("./database/quotes.db", check_same_thread=False)
 
 logging.basicConfig(level=logging.INFO)
 
