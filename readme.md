@@ -18,5 +18,6 @@ Or just use docker
 
 2.2.1 `docker run -itd --name my-quotes --net=host -v $HOME/dq:/dq -p 8080:8080 my-quotes -e MAIL_USERNAME="${MAIL_USERNAME}" -e MAIL_PASSWORD="${MAIL_PASSWORD}"` - in case you need data for export to mt 4/5
 
+2.2.2 `docker run -itd --name my-quotes --net=host -p 8080:8080 -v /home/dima/PycharmProjects/stock_updated/application:/data/db my-quotes`
 
 https://mrjbq7.github.io/ta-lib/install.html
