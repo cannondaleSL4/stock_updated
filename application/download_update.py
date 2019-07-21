@@ -144,6 +144,9 @@ def create_dir(dir_instrument):
 
 def clear_dir(dir_instrument):
     dir = UPLOAD_FOLDER + "/" + dir_instrument
+    if not os.path.exists(dir):
+        logging.info("dir {} is not exists")
+        return
     for the_file in os.listdir(dir):
         file_path = os.path.join(dir, the_file)
         try:
