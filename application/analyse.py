@@ -52,15 +52,15 @@ def make_analyse(instruments_for_analyse):
 
 def get_dataframe_of_instrument(instrument):
 
-    data_hour = select_from_database(all_instruments.get(instrument))
+    data_day = select_from_database(all_instruments.get(instrument))
 
-    data_day = pd.DataFrame()
-    data_day["code"] = data_hour.code.resample('D').first().dropna(how='any')
-    data_day["open"] = data_hour.open.resample('D').first().dropna(how='any')
-    data_day["high"] = data_hour.high.resample('D').max().dropna(how='any')
-    data_day["low"] = data_hour.low.resample('D').min().dropna(how='any')
-    data_day["close"] = data_hour.close.resample('D').last().dropna(how='any')
-    data_day["vol"] = data_hour.vol.resample('D').sum().dropna(how='any')
+    # data_day = pd.DataFrame()
+    # data_day["code"] = data_hour.code.resample('D').first().dropna(how='any')
+    # data_day["open"] = data_hour.open.resample('D').first().dropna(how='any')
+    # data_day["high"] = data_hour.high.resample('D').max().dropna(how='any')
+    # data_day["low"] = data_hour.low.resample('D').min().dropna(how='any')
+    # data_day["close"] = data_hour.close.resample('D').last().dropna(how='any')
+    # data_day["vol"] = data_hour.vol.resample('D').sum().dropna(how='any')
 
     data_week = pd.DataFrame()
     data_week["code"] = data_hour.code.resample('W').first().dropna(how='any')

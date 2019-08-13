@@ -18,7 +18,7 @@ def indicators_make_analyse(dict_of_dataframes):
         results['wma result'] = get_result_currency(dict_of_dataframes)
     else:
         dict_of_stock_results = get_result_stock(dict_of_dataframes)
-        results['wma result'] = dict_of_stock_results.get('wma')
+        results['wma result'] = "stub"
         results['rsi result'] = dict_of_stock_results.get('rsi')
         results['williams'] = dict_of_stock_results.get('williams')
 

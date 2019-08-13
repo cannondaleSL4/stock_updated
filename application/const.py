@@ -974,7 +974,6 @@ stocks_instruments={
     'Xilinx, Inc.':875101,
     'Xylem Inc.':875104,
     'YY Inc.':875106,
-    # 'Yahoo INC':19075,
     'Yelp Inc.':876372,
     'Yum! Brands, Inc.':875105,
     'Zebra Technologies Corporation':875108,

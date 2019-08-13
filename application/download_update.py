@@ -47,8 +47,6 @@ def make_request(list_for_update, today_only=True):
 
 
 def execute_request(instrument, market_code, instrument_dir, today_only):
-    # logging.info("Start to update {} at the {}".format(str(instrument),
-    #                                                    datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')))
     path_to_dir = UPLOAD_FOLDER + "/" + instrument_dir
     file_instrument_name = instrument.replace(" ", "_").replace("&", "_").replace("/", "_") + "_"
     instrument_code = str(all_instruments.get(instrument))
@@ -69,7 +67,7 @@ def execute_request(instrument, market_code, instrument_dir, today_only):
             list_of_dates[i+1].month - 1,
             list_of_dates[i+1].year,
             list_of_dates[i+1].strftime("%m.%d.%Y"),
-            periods.get("_HOUR"),
+            periods.get("_DAY"),
             file_name
         )
 
@@ -118,7 +116,7 @@ def get_list_of_dates(today_only=False):
 
     if today_only:
         # truly it should have been 1 but i had set 5 for safety
-        period_ago = 5
+        period_ago = 365
         period = 2
         data_begin = (datetime.datetime.now() - datetime.timedelta(days=period_ago)).strftime("%m.%d.%Y")
         dates = pd.Series(pd.date_range(start=data_begin, end=data_end, periods=period))

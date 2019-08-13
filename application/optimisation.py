@@ -14,7 +14,6 @@ from const import *
 logging.basicConfig(level=logging.INFO)
 
 
-
 def get_best_params(dict_of_instruments=currency):
     instrument = os.getenv('INSTRUMENT')
     logging.info("Begin procedure of optimisation")
